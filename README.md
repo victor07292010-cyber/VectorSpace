@@ -1,5 +1,7 @@
 # Game Night
 
+[Play the published collection](https://victors-game-night.salazar2010.chatgpt.site)
+
 Twenty browser games in one portable folder, with online rooms for up to eight friends. No sign-in, ads, remote fonts, or build step. The bundled PeerJS library connects players directly.
 
 ## Play locally
