@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#183f41" />
+    <meta name="description" content="Take VectorSpace with you. Download once, open locally, and enjoy solo games and computer opponents without internet." />
+    <title>Play offline · VectorSpace</title>
+    <link rel="icon" href="favicon.svg" type="image/svg+xml" />
+    <style>
+      :root { color-scheme: light; font-family: "Segoe UI", Arial, sans-serif; color: #183337; background: #f5f4ee; }
+      * { box-sizing: border-box; }
+      body { margin: 0; }
+      a { color: inherit; text-underline-offset: 4px; }
+      a:focus-visible { outline: 3px solid #d68d21; outline-offset: 5px; }
+      .shell { max-width: 1080px; margin: auto; padding: 32px clamp(22px, 5vw, 64px) 52px; }
+      nav { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 16px; margin-bottom: 56px; font-size: 14px; }
+      .brand { font-weight: 800; letter-spacing: -.7px; font-size: 24px; text-decoration: none; }
+      .brand b { color: #b9761b; }
+      .eyebrow { color: #557561; text-transform: uppercase; font-size: 12px; font-weight: 800; letter-spacing: 2px; }
+      h1 { max-width: 700px; font: 500 clamp(40px, 7vw, 66px)/1.05 Georgia, serif; letter-spacing: -2px; margin: 18px 0 22px; }
+      .intro { max-width: 620px; color: #5c6f6f; font-size: 18px; line-height: 1.7; }
+      .steps { list-style: none; padding: 0; display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; margin: 36px 0 24px; counter-reset: step; }
+      .steps li { counter-increment: step; background: #fffefa; border: 1px solid #dde2d6; border-radius: 24px; padding: 26px; box-shadow: 0 8px 22px #233b2810; }
+      .steps li::before { content: "0" counter(step); display: grid; place-items: center; width: 44px; height: 44px; border-radius: 15px; background: #e8eddd; color: #3c624c; font-weight: 800; font-size: 15px; margin-bottom: 22px; }
+      h2 { font-size: 18px; margin: 0 0 10px; }
+      p { line-height: 1.65; margin: 0 0 14px; }
+      .steps p { color: #647477; font-size: 14px; margin: 0; }
+      code { background: #e8eddf; padding: 3px 6px; border-radius: 5px; font-size: .9em; overflow-wrap: anywhere; }
+      .note { color: #647477; font-size: 14px; }
+      .play { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; margin-top: 38px; padding: 32px; border-radius: 26px; background: #183f41; color: #f7f5e7; }
+      .play h2 { color: #ebc36b; }
+      .play p { color: #d6e2d4; font-size: 15px; }
+      .play a { color: #f7db97; }
+      .button { display: inline-flex; align-items: center; justify-content: center; gap: 12px; text-decoration: none; background: #f6c25f; color: #273b2c; border: 1px solid #d6a148; box-shadow: 0 3px 0 #bb8f40; border-radius: 14px; padding: 13px 20px; font-size: 14px; font-weight: 700; transition: transform .15s; }
+      .button:hover { transform: translateY(-2px); }
+      .finish { margin-top: 28px; display: flex; gap: 20px; flex-wrap: wrap; align-items: center; }
+      .finish p { margin: 0; flex: 1 1 260px; }
+      @media (max-width: 700px) { nav { margin-bottom: 36px; } .steps, .play { grid-template-columns: 1fr; } .steps li { padding: 22px; } .steps li::before { margin-bottom: 14px; } .play { padding: 26px; gap: 18px; } }
+      @media (prefers-reduced-motion: reduce) { .button { transition: none; } }
+    </style>
+  </head>
+  <body>
+    <div class="shell">
+      <nav aria-label="Main navigation">
+        <a class="brand" href="index.html">VectorSpace<b>.</b></a>
+        <a href="index.html">← Back to the games</a>
+      </nav>
+      <main>
+        <div class="eyebrow">Good games, anywhere</div>
+        <h1>A little friendly competition.<br />Even offline.</h1>
+        <p class="intro">Save the collection once and bring <strong>17 offline games</strong> with you, including <strong>12 with computer opponents</strong>. No account, app installation, or internet needed to play locally.</p>
+        <ol class="steps">
+          <li><h2>Download the collection</h2><p>Use <strong>Download offline</strong> on the home page. Save the VectorSpace ZIP somewhere you can find it.</p></li>
+          <li><h2>Extract the whole ZIP</h2><p>On Windows, right-click and choose <strong>Extract All</strong>. On a Mac, double-click the ZIP. Keep all the extracted files together.</p></li>
+          <li><h2>Open &amp; play</h2><p>Open the <strong>VectorSpace</strong> folder and double-click <code>index.html</code>. Your browser opens the collection. Choose a solo or computer game.</p></li>
+        </ol>
+        <p class="note">Already looking at the downloaded folder? You’re ready. Open <a href="index.html">the game library</a>. Avoid opening the HTML inside a ZIP preview: extract it first so every game can load.</p>
+        <section class="play" aria-label="Offline and online play">
+          <div>
+            <h2>Your computer is ready to play.</h2>
+            <p>Try Color Clash, Crazy Eights, Go Fish, Sea Battle, Connect Four, Pig Dice, Tic-Tac-Toe, Face Finder, Reversi, Dots &amp; Boxes, Liar’s Dice, or Rock Paper Scissors. Choose <strong>Vs computer</strong> where a player mode is offered.</p>
+            <p>Prefer your own pace? Solitaire, Shut the Box, and Higher or Lower are ready for a solo session. Computer opponents run on your device; no AI subscription or cloud connection is needed.</p>
+          </div>
+          <div>
+            <h2>Room codes need a connection.</h2>
+            <p>Same-screen games work offline where offered. Online rooms need internet and friends on their own devices. The host must keep the room open.</p>
+            <p>Imposter, Mafia, and Sketch Party are social games for real groups. Use <a href="https://victor07292010-cyber.github.io/VectorSpace/">VectorSpace online</a> for the easiest room experience.</p>
+          </div>
+        </section>
+        <div class="finish">
+          <a class="button" href="index.html">Let’s play <span aria-hidden="true">↗</span></a>
+          <p class="note">Your download is a snapshot. Pick up a fresh copy from the website when you want the latest games and improvements.</p>
+        </div>
+      </main>
+    </div>
+  </body>
+</html>

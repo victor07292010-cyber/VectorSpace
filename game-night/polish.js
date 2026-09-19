@@ -286,7 +286,7 @@ window.GameNightPolish = (() => {
       sound = !sound;
       syncSoundButton(toggle);
       if (sound) playSound();
-      toast(sound ? "A little sound for your game night." : "Sounds off. Play on.");
+      toast(sound ? "A little sound for your space." : "Sounds off. Play on.");
     });
     document.addEventListener("keydown", event => {
       if (["Tab", "Enter", " ", "ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown"].includes(event.key)) {

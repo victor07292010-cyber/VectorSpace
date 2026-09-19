@@ -2,5 +2,6 @@ node_modules/
 .sites-runtime/
 *.log
 artifacts/
+game-night/downloads/*.zip
 .DS_Store
 Thumbs.db

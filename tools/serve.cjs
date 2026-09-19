@@ -36,5 +36,5 @@ http
     });
   })
   .listen(4173, "127.0.0.1", () =>
-    console.log("Game Night: http://127.0.0.1:4173/"),
+    console.log("VectorSpace: http://127.0.0.1:4173/"),
   );
