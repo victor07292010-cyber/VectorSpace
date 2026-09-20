@@ -45,6 +45,8 @@ window.GameNightPolish = (() => {
     return `<b class="art-die ${cls}">${pips(n)}</b>`;
   }
   function tileIllustration(id) {
+    const illustrated = ['shut-box','solitaire','color-clash','crazy-eights','go-fish','sea-battle','spectrum','connect-four','memory','pig','tic-tac-toe','higher-lower','imposter','pictionary','guess-who','mafia','liars-dice','rock-paper-scissors','reversi','dots-boxes'];
+    if (illustrated.includes(id)) return `<img class="tile-cover" src="assets/covers/${id}.svg" alt="" width="300" height="190" loading="lazy" decoding="async">`;
     switch (id) {
       case "shut-box": return `<span class="tile-art art-box">${artDie("one", 3)}${artDie("two", 5)}<span class="art-numbers"><b>1</b><b>2</b><b>3</b></span></span>`;
       case "solitaire": return `<span class="tile-art">${artCard("one red", "K", "♥")}${artCard("two", "Q", "♣")}${artCard("three", "A", "♠")}</span>`;
