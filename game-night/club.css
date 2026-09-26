@@ -67,3 +67,12 @@ footer { border-color:#dcded9; color:#626976; background:#f1f2eb; }
 @media(max-width:760px) { .lobby { grid-template-columns:minmax(0,1fr); padding-top:27px; } .lobby > .offline-banner,.lobby > .online-hero { grid-column:1; } .lobby-heading h1 { font-size:2.7rem; letter-spacing:-1.8px; } .collection-stamp { width:85px; height:85px; padding:10px; box-shadow:3px 3px 0 #202b36; }.collection-stamp strong { font-size:2rem; }.collection-stamp span { font-size:.42rem; } .lobby-heading { gap:15px; }.online-hero { gap:15px; }.online-hero,.offline-banner { padding:19px; }.offline-banner { margin-bottom:21px; }.game-grid { grid-template-columns:repeat(2,minmax(0,1fr)); gap:18px 14px; }.tile-content { padding:13px; }.tile-content h2 { font-size:1rem; }.tile-meta { flex-direction:column; gap:4px; }.tile-content p { min-height:58px; }.play-style-bar { display:block; }.site-header { height:69px; } }
 @media(max-width:420px) { .collection-stamp { display:none; }.lobby-heading h1 { font-size:2.5rem; }.tile-content { padding:12px 10px; }.tile-content h2 { font-size:.94rem; }.tile-content p { font-size:.76rem; min-height:72px; }.tile-content h2 span { display:none; }.browse-bar { flex-wrap:wrap; gap:12px; }.filter { font-size:.76rem; padding:8px 10px; }.brand { font-size:1.18rem; }.online-hero-actions .button { font-size:.8rem; }.offline-actions .button { font-size:.8rem; }.game-grid { gap:16px 12px; } }
 @media(prefers-reduced-motion:reduce) { .tile-cover,.game-tile,.button { transition:none; }.game-tile:hover .tile-cover { transform:none; } }
+
+/* Invitation links remain selectable when clipboard access is unavailable. */
+.room-code-card { min-width:0; max-width:440px; gap:10px; }
+.room-code-card label { font-size:.75rem; color:var(--muted); }
+.room-invite-link { display:block; width:100%; min-width:0; padding:10px 12px; border:1px solid #b8c0be; border-radius:8px; background:white; color:#202b36; font:inherit; font-size:.8rem; }
+.room-code-card .button { width:100%; }
+.is-invited #room-create { display:none; }
+.is-invited .room-entry-grid { grid-template-columns:minmax(0,520px); justify-content:center; }
+@media(max-width:760px){ .room-code-card {max-width:none;width:100%;} }

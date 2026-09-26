@@ -9,12 +9,19 @@ window.GameNightRoom = (() => {
   const listeners=new Set(), connections=new Map();
   let peer=null, hostConnection=null, host=false, room=null, snapshot=null;
   let code='', playerToken='', myId='', status='idle', error='', generation=0, revision=0;
-  let timeout=null, heartbeat=null, retryTimer=null, retries=0, moveSequence=0, joiningName='';
+  let timeout=null, heartbeat=null, retryTimer=null, retries=0, moveSequence=0, joiningName='', lastHostPacket=0;
   const stored=(key,fallback='')=>{try{return sessionStorage.getItem(key)||fallback;}catch{return fallback;}};
   const persist=(key,value)=>{try{sessionStorage.setItem(key,value);}catch{}};
   const uid=()=>{const values=new Uint8Array(16);crypto.getRandomValues(values);return Array.from(values,x=>x.toString(16).padStart(2,'0')).join('');};
   const roomCode=()=>{const chars='ABCDEFGHJKLMNPQRSTUVWXYZ23456789',values=new Uint8Array(6);crypto.getRandomValues(values);return Array.from(values,v=>chars[v%chars.length]).join('');};
   const cleanName=name=>String(name||'').replace(/[\u0000-\u001f\u007f]/g,'').trim().slice(0,20)||'Player';
+  // Accept a code or an invitation URL without silently stripping unrelated text.
+  function normalizeCode(input){
+    let value=String(input||'').trim();
+    if(/^https?:\/\//i.test(value)){try{value=new URL(value).hash;}catch{return '';}}
+    if(value.startsWith('#join/'))value=value.slice(6);
+    return value.toUpperCase().replace(/[\s-]/g,'');
+  }
   const publicPlayer=p=>({id:p.id,name:p.name,ready:p.ready,connected:p.connected,host:p.host,wins:p.wins||0});
   const notify=()=>listeners.forEach(fn=>fn());
   function data(){return {status,error,code,isHost:host,myId,snapshot};}
@@ -47,7 +54,7 @@ window.GameNightRoom = (() => {
     else safeSend(hostConnection,{kind:'leave'});
     stop(150);host=false;room=null;snapshot=null;status='idle';error='';code='';myId='';retries=0;persist('gn-room-code','');notify();
   }
-  function fail(message){status='error';error=message;clearTimeout(timeout);notify();}
+  function fail(message){stop();status='error';error=message;notify();}
   function errorText(err){
     if(err.type==='peer-unavailable')return 'That room is not open. Check the code and ask the host to keep their room open.';
     if(err.type==='browser-incompatible')return 'Your browser cannot make this connection. Try a recent version of Chrome, Edge, Firefox, or Safari.';
@@ -95,7 +102,7 @@ window.GameNightRoom = (() => {
   function accept(conn,gen){
     if(gen!==generation){conn.close();return;}
     let admitted=null,lastPacket=0,burst=0;
-    const wait=setTimeout(()=>{if(!admitted)conn.close();},10000);
+    const wait=setTimeout(()=>{if(!admitted)conn.close();},30000);
     conn.on('open',()=>{
       if(gen!==generation)return;
       const meta=conn.metadata||{};
@@ -114,6 +121,7 @@ window.GameNightRoom = (() => {
       const now=Date.now();if(now-lastPacket>1000){burst=0;lastPacket=now;}if(++burst>30)return;
       const member=room.players.find(p=>p.id===admitted);if(member)member.lastSeen=now;
       if(m.kind==='pong')return;
+      if(m.kind==='sync'){safeSend(conn,{kind:'snapshot',data:makeSnapshot(admitted)});return;}
       if(m.kind==='leave'){disconnectMember(admitted,conn,true);conn.close();return;}
       command(admitted,m);
     });
@@ -129,7 +137,7 @@ window.GameNightRoom = (() => {
     let attempts=0;
     function open(){
       peer=new Peer(PREFIX+code,options());
-      peer.on('open',()=>{if(gen!==generation)return;clearTimeout(timeout);error='';publish();});
+      peer.on('open',()=>{if(gen!==generation)return;clearTimeout(timeout);clearTimeout(retryTimer);retryTimer=null;error='';publish();});
       peer.on('connection',c=>accept(c,gen));
       peer.on('error',err=>{if(gen!==generation)return;if(err.type==='unavailable-id'&&attempts++<4){peer.destroy();code=roomCode();open();return;}if(!snapshot)fail(errorText(err));else{error='New guests cannot connect right now. Existing players can keep playing.';notify();}});
       peer.on('disconnected',()=>{if(gen!==generation)return;error='Room service connection interrupted. Reconnecting…';notify();retryTimer=setTimeout(()=>{if(peer?.disconnected&&!peer.destroyed)peer.reconnect();},2000);});
@@ -138,20 +146,24 @@ window.GameNightRoom = (() => {
     heartbeat=setInterval(()=>{if(gen!==generation||!room)return;for(const [id,conn]of connections){const member=room.players.find(p=>p.id===id);if(Date.now()-(member?.lastSeen||Date.now())>30000){disconnectMember(id,conn);conn.close();}else safeSend(conn,{kind:'ping'});}},5000);
   }
   function join(name,inputCode,resuming=false){
-    const normalized=String(inputCode||'').toUpperCase().replace(/[\s-]/g,'');
-    if(!/^[A-HJ-NP-Z2-9]{6}$/.test(normalized)){fail('Enter the six-character room code from your host.');return;}
+    const normalized=normalizeCode(inputCode);
+    if(!/^[A-HJ-NP-Z2-9]{6}$/.test(normalized)){error='Enter the six-character room code or invitation link from your host.';if(!snapshot)status='error';notify();return;}
     const previous=stored('gn-room-code');const token=previous===normalized?stored('gn-player-token'):'';
-    stop();host=false;room=null;hostConnection=null;code=normalized;joiningName=cleanName(name);playerToken=token||uid();myId='';if(!resuming){snapshot=null;retries=0;}
+    if(!resuming)leave();else stop();
+    host=false;room=null;hostConnection=null;code=normalized;joiningName=cleanName(name);playerToken=token||uid();myId='';if(!resuming){snapshot=null;retries=0;}
     status=resuming?'reconnecting':'connecting';error='';moveSequence=0;persist('gn-room-code',code);persist('gn-player-token',playerToken);notify();
     const gen=generation;
     if(typeof Peer!=='function'){fail('The connection library did not load. Refresh the page and try again.');return;}
+    lastHostPacket=Date.now();
     peer=new Peer(undefined,options());
     peer.on('open',()=>{
       if(gen!==generation)return;
       if(hostConnection?.open) return;
       hostConnection=peer.connect(PREFIX+code,{reliable:true,serialization:'json',metadata:{version:VERSION,name:joiningName,token:playerToken}});
+      hostConnection.on('open',()=>{if(gen===generation)safeSend(hostConnection,{kind:'sync'});});
       hostConnection.on('data',m=>{
         if(gen!==generation||!m||typeof m!=='object')return;
+        lastHostPacket=Date.now();
         if(m.kind==='snapshot'&&m.data?.version===VERSION&&m.data.code===code){clearTimeout(timeout);snapshot=m.data;myId=snapshot.me;status='connected';error='';retries=0;notify();}
         if(m.kind==='ping')safeSend(hostConnection,{kind:'pong'});
         if(m.kind==='notice'){error=String(m.text||'').slice(0,200);notify();}
@@ -163,6 +175,11 @@ window.GameNightRoom = (() => {
     });
     peer.on('error',err=>{if(gen!==generation)return;if(snapshot&&retries<5){reconnect();}else fail(errorText(err));});
     peer.on('disconnected',()=>{if(gen===generation&&hostConnection?.open){try{peer.reconnect();}catch{}}});
+    heartbeat=setInterval(()=>{
+      if(gen!==generation||!hostConnection?.open)return;
+      if(status==='connected'&&Date.now()-lastHostPacket>25000){reconnect();return;}
+      if(!snapshot)safeSend(hostConnection,{kind:'sync'});
+    },5000);
     timeout=setTimeout(()=>{if(gen===generation&&status!=='connected')fail('Could not connect to the host. Check the code, keep the host’s tab open, or try another network. Some school, work, and mobile networks block direct connections.');},22000);
   }
   function reconnect(){
@@ -189,5 +206,5 @@ window.GameNightRoom = (() => {
   function subscribe(fn){listeners.add(fn);return()=>listeners.delete(fn);}
   window.addEventListener('beforeunload',e=>{if(status==='connected'&&host&&room?.players.length>1){e.preventDefault();e.returnValue='';}});
   window.addEventListener('pagehide',()=>{if(host)connections.forEach(c=>safeSend(c,{kind:'ended'}));else safeSend(hostConnection,{kind:'leave'});});
-  return {data,create,join,leave,subscribe,choose,start,backToLobby,move,ready,react,retry,cleanName};
+  return {data,create,join,leave,subscribe,choose,start,backToLobby,move,ready,react,retry,cleanName,normalizeCode};
 })();

@@ -12,16 +12,16 @@ const clock=new Clock(),server=new Map();let serial=0;
 class Events {constructor(){this.handlers={};}on(k,fn){(this.handlers[k]??=[]).push(fn);}emit(k,...args){for(const fn of this.handlers[k]||[])fn(...args);}}
 class Connection extends Events {
  constructor(){super();this.open=false;this.closed=false;}
- send(data){if(!this.open)throw Error('closed');const clone=JSON.parse(JSON.stringify(data));clock.set(()=>{if(this.other.open)this.other.emit('data',clone);},1);}
+ send(data){if(this.dropAll||(this.dropSnapshot&&data.kind==='snapshot')){this.dropSnapshot=false;return;}if(!this.open)throw Error('closed');const clone=JSON.parse(JSON.stringify(data));clock.set(()=>{if(this.other.open)this.other.emit('data',clone);},1);}
  close(){if(this.closed)return;this.closed=true;this.open=false;const other=this.other;other.closed=true;other.open=false;clock.set(()=>{this.emit('close');other.emit('close');},1);}
 }
 class Peer extends Events {
  constructor(id){super();this.id=id||'guest-'+(++serial);this.destroyed=false;this.disconnected=false;this.links=[];clock.set(()=>{if(this.destroyed)return;if(server.has(this.id)){this.emit('error',{type:'unavailable-id'});return;}server.set(this.id,this);this.emit('open',this.id);},1);}
- connect(id,opts){const a=new Connection(),b=new Connection();a.other=b;b.other=a;b.metadata=opts.metadata;this.links.push(a);const host=server.get(id);if(!host){clock.set(()=>this.emit('error',{type:'peer-unavailable'}),1);return a;}host.links.push(b);clock.set(()=>{host.emit('connection',b);clock.set(()=>{if(this.destroyed||host.destroyed)return;a.open=b.open=true;b.emit('open');a.emit('open');},1);},1);return a;}
+ connect(id,opts){const a=new Connection(),b=new Connection();a.other=b;b.other=a;b.metadata=opts.metadata;b.dropSnapshot=Peer.dropFirstSnapshot;Peer.dropFirstSnapshot=false;this.links.push(a);const host=server.get(id);if(!host){clock.set(()=>this.emit('error',{type:'peer-unavailable'}),1);return a;}host.links.push(b);clock.set(()=>{host.emit('connection',b);clock.set(()=>{if(this.destroyed||host.destroyed)return;a.open=b.open=true;b.emit('open');a.emit('open');},Peer.openDelay||1);},1);return a;}
  reconnect(){this.disconnected=false;server.set(this.id,this);clock.set(()=>this.emit('open',this.id),1);}
  destroy(){if(this.destroyed)return;this.destroyed=true;server.delete(this.id);this.links.forEach(c=>c.close());this.emit('close');}
 }
-function world(){const store=new Map();const context=vm.createContext({console,crypto:webcrypto,Peer,setTimeout:(fn,ms)=>clock.set(fn,ms),clearTimeout:id=>clock.clear(id),setInterval:(fn,ms)=>clock.set(fn,ms,ms),clearInterval:id=>clock.clear(id),Date:class extends Date{static now(){return clock.now;}},sessionStorage:{getItem:k=>store.get(k),setItem:(k,v)=>store.set(k,v)}});context.window=context;context.addEventListener=()=>{};for(const file of ['shared.js','online-core.js','online-cards.js','online-boards.js','online-extras.js','online-competitive.js','online-deduction.js','online-creative.js'])vm.runInContext(fs.readFileSync(path.join(base,file),'utf8'),context,{filename:file});return {context,room:context.GameNightRoom};}
+function world(){const store=new Map();const context=vm.createContext({console,crypto:webcrypto,Peer,URL,setTimeout:(fn,ms)=>clock.set(fn,ms),clearTimeout:id=>clock.clear(id),setInterval:(fn,ms)=>clock.set(fn,ms,ms),clearInterval:id=>clock.clear(id),Date:class extends Date{static now(){return clock.now;}},sessionStorage:{getItem:k=>store.get(k),setItem:(k,v)=>store.set(k,v)}});context.window=context;context.addEventListener=()=>{};for(const file of ['shared.js','online-core.js','online-cards.js','online-boards.js','online-extras.js','online-competitive.js','online-deduction.js','online-creative.js'])vm.runInContext(fs.readFileSync(path.join(base,file),'utf8'),context,{filename:file});return {context,room:context.GameNightRoom};}
 const h=world(),g=world(),third=world();h.room.create('Host','tic-tac-toe');clock.advance(10);assert.equal(h.room.data().status,'connected');const code=h.room.data().code;g.room.join('Guest',code);clock.advance(20);assert.equal(g.room.data().snapshot.players.length,2);assert.equal(h.room.data().snapshot.players.length,2);assert.notEqual(h.room.data().myId,g.room.data().myId);
 assert.equal(g.room.data().isHost,false);g.room.choose('pig');assert.equal(h.room.data().snapshot.gameId,'tic-tac-toe');g.room.start();assert.equal(h.room.data().snapshot.phase,'lobby');
 g.room.ready(true);clock.advance(10);h.room.start();clock.advance(10);assert.equal(g.room.data().snapshot.phase,'playing');
@@ -38,3 +38,48 @@ h.room.leave();clock.advance(10);assert.equal(g.room.data().status,'ended');g.ro
 // Failed reconnects exhaust bounded backoff instead of stopping after attempt one.
 h.room.create('Host','tic-tac-toe');clock.advance(10);const newCode=h.room.data().code;g.room.join('Guest',newCode);clock.advance(20);g.room.ready(true);clock.advance(10);h.room.start();clock.advance(10);const vanished=server.get('gamenight-v2-'+newCode);server.delete(vanished.id);vanished.links.filter(c=>c.open).forEach(c=>c.close());clock.advance(40000);assert.equal(g.room.data().status,'error');h.room.leave();g.room.leave();
 clock.advance(200);assert.equal(server.size,0);console.log('PASS independent-room joining, host privileges, legal turns, wins, rematch, reconnect, hidden cards/targets, late-join refusal, bounded retry, cleanup.');
+
+// A slow ICE handshake used to be closed after 10 seconds, before the 22-second join deadline.
+Peer.openDelay=15000;h.room.create('Slow host');clock.advance(10);
+g.room.join('Slow guest',h.room.data().code);clock.advance(16000);
+assert.equal(g.room.data().status,'connected','slow successful handshake remains open');
+h.room.leave();g.room.leave();clock.advance(200);Peer.openDelay=1;
+
+// A dropped initial snapshot must be recovered without another player taking an action.
+h.room.create('Host');clock.advance(10);Peer.dropFirstSnapshot=true;
+g.room.join('Guest',h.room.data().code);clock.advance(6000);
+assert.equal(g.room.data().status,'connected','sync handshake recovers first snapshot');
+const stalled=[...server.values()].find(p=>p.id.startsWith('gamenight-v2-')).links.find(c=>c.open);
+stalled.dropAll=true;clock.advance(31000);
+assert.equal(g.room.data().status,'connected','silent channel stall reconnects');
+assert.equal(h.room.data().snapshot.players.length,2,'reconnect retains one seat');
+h.room.leave();g.room.leave();clock.advance(200);
+
+// Private room capacity is eight; a ninth guest must be rejected without changing the lobby.
+const members=Array.from({length:8},()=>world());
+members[0].room.create('Host','rock-paper-scissors');clock.advance(10);
+const invite='https://vectorspaceinternationaldevelopment.online/#join/'+members[0].room.data().code;
+for(let i=1;i<8;i++){members[i].room.join('Friend '+i,invite);clock.advance(20);}
+for(const m of members)assert.equal(m.room.data().snapshot.players.length,8);
+third.room.join('Ninth',invite);clock.advance(20);assert.match(third.room.data().error,/full/);
+for(const m of members.slice(1)){m.room.ready(true);clock.advance(10);}
+members[0].room.start();clock.advance(10);
+for(const m of members)assert.equal(m.room.data().snapshot.phase,'playing');
+members[0].room.leave();clock.advance(10);
+for(const m of members.slice(1)){assert.equal(m.room.data().status,'ended');m.room.leave();}
+third.room.leave();clock.advance(200);assert.equal(server.size,0);
+assert.equal(h.room.normalizeCode('https://example.com/#join/ABC234'),'ABC234');
+assert.equal(h.room.normalizeCode(' abc-234 '),'ABC234');
+assert.notEqual(h.room.normalizeCode('https://example.com/ABC234'),'ABC234');
+console.log('PASS slow handshake, initial snapshot recovery, silent-stall reconnect, invite URLs, eight-player lobby and ninth-player refusal.');
+
+const firstHost=world(),secondHost=world(),follower=world();
+firstHost.room.create('First host');secondHost.room.create('Second host');clock.advance(10);
+follower.room.join('Follower',firstHost.room.data().code);clock.advance(20);
+const secondCode=secondHost.room.data().code;
+firstHost.room.join('First host',secondCode);clock.advance(200);
+assert.equal(firstHost.room.data().code,secondCode);
+assert.equal(firstHost.room.data().snapshot.players.length,2);
+assert.equal(follower.room.data().status,'ended','switching hosts explicitly closes old room for guests');
+firstHost.room.leave();secondHost.room.leave();follower.room.leave();clock.advance(200);
+console.log('PASS host switches to a friend’s room and former guests receive room-closed notice.');
