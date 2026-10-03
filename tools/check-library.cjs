@@ -14,11 +14,11 @@ const ids = () => [...d.querySelectorAll(".game-tile")].map(a => a.hash.replace(
 const click = selector => { const el = d.querySelector(selector); assert.ok(el, selector); el.click(); };
 const visit = hash => { w.history.replaceState(null, "", "#" + hash); w.dispatchEvent(new w.HashChangeEvent("hashchange")); };
 try {
-  assert.equal(w.GameNight.catalog.length, 30);
-  assert.equal(new Set(w.GameNight.catalog.map(e => e[0])).size, 30, "Unique game routes");
-  assert.equal(Object.keys(w.RoomGames.games).length, 30);
-  assert.equal(ids().length, 30);
-  assert.equal(d.querySelectorAll(".new-game-badge").length, 10);
+  assert.equal(w.GameNight.catalog.length, 50);
+  assert.equal(new Set(w.GameNight.catalog.map(e => e[0])).size, 50, "Unique game routes");
+  assert.equal(Object.keys(w.RoomGames.games).length, 50);
+  assert.equal(ids().length, 50);
+  assert.equal(d.querySelectorAll(".new-game-badge").length, 20);
   for (const entry of w.GameNight.catalog) {
     const engine = w.RoomGames.games[entry[0]];
     assert.ok(engine && engine.min <= engine.max && engine.max <= 8, `Valid online capacity: ${entry[0]}`);
@@ -49,12 +49,12 @@ try {
     click("#restart");
     assert.ok(d.querySelector("#game-root").textContent.trim(), `${id} restarts`);
   }
-  for (const id of ["imposter", "mafia", "pictionary"]) {
+  for (const id of ["imposter", "mafia", "pictionary", "punchline", "heist-crew", "doodle-decoy"]) {
     visit("online/" + id);
     assert.ok(d.querySelector("input"), `${id} routes to the room interface`);
   }
   visit("");
-  assert.equal(ids().length, 30);
+  assert.equal(ids().length, 50);
   assert.equal(errors.length, 0, errors.join("\n"));
-  console.log("PASS integrated 30-game library, 10 new labels, 22 CPU modes, 27 offline routes/restarts, group filter, search/escaping, room links and production script order.");
+  console.log("PASS integrated 50-game library, 20 new labels, 22 CPU modes, 27 offline routes/restarts, group filter, search/escaping, room links and production script order.");
 } finally { dom.window.close(); }
