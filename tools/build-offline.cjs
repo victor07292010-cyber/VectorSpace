@@ -132,7 +132,7 @@ Keep the whole folder together. Opening index.html inside a ZIP preview,
 or moving it away from the other files, can stop the games from loading.
 
 SOLO AND COMPUTER OPPONENTS
-The Offline filter includes 17 games; 12 have computer opponents.
+The Offline filter includes 27 games; 22 have computer opponents.
 Look for Solo or Vs computer in the game library. The card, board, and
 dice classics run locally, with no account, installation, or internet.
 Where a game offers a player mode, choose Vs computer to face a CPU.

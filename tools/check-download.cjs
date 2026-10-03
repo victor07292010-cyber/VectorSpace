@@ -85,7 +85,7 @@ function extractZip() {
     fs.writeFileSync(target, bytes);
   }
   assert.equal(position, end);
-  for (const required of ["index.html", "offline-help.html", "START-HERE.txt", "cpu-games.js", "vendor/PEERJS-LICENSE.txt"]) {
+  for (const required of ["index.html", "offline-help.html", "START-HERE.txt", "cpu-games.js", "strategy-pack.js", "party-pack.js", "strategy-pack.css", "party-pack.css", "room-enhancements.css", "vendor/PEERJS-LICENSE.txt"]) {
     assert.ok(names.has(`VectorSpace/${required}`), `Download includes ${required}`);
   }
   pass(`ZIP extraction and CRC checks (${count} entries; no source-only or recursive files)`);
@@ -166,8 +166,8 @@ async function main() {
   assert.equal(dom.window.location.protocol, "file:");
   assert.match(document.title, /VectorSpace/);
   assert.equal(errors.length, 0, errors.map(String).join("\n"));
-  assert.equal(Object.keys(dom.window.GameNight.games).length, 17, "Local game scripts actually executed");
-  assert.equal(Object.keys(dom.window.RoomGames.games).length, 20, "All shared game engines actually executed");
+  assert.equal(Object.keys(dom.window.GameNight.games).length, 27, "Local game scripts actually executed");
+  assert.equal(Object.keys(dom.window.RoomGames.games).length, 30, "All shared game engines actually executed");
   assert.ok(document.styleSheets.length > 0, "Bundled stylesheet loaded from the extracted archive");
   for (const resource of document.querySelectorAll('script[src], link[rel="stylesheet"]')) {
     const file = path.resolve(fileURLToPath(resource.src || resource.href));
@@ -176,13 +176,13 @@ async function main() {
   }
   pass("Extracted index.html loads via file:// without a web server or CDN");
 
-  const offlineIds = ["shut-box", "solitaire", "color-clash", "crazy-eights", "go-fish", "sea-battle", "spectrum", "connect-four", "memory", "pig", "tic-tac-toe", "higher-lower", "guess-who", "dots-boxes", "reversi", "liars-dice", "rock-paper-scissors"];
-  const cpuIds = ["color-clash", "crazy-eights", "go-fish", "sea-battle", "connect-four", "pig", "tic-tac-toe", "guess-who", "dots-boxes", "reversi", "liars-dice", "rock-paper-scissors"];
+  const offlineIds = ["shut-box", "solitaire", "color-clash", "crazy-eights", "go-fish", "sea-battle", "spectrum", "connect-four", "memory", "pig", "tic-tac-toe", "higher-lower", "guess-who", "dots-boxes", "reversi", "liars-dice", "rock-paper-scissors", "checkers", "mancala", "dominoes", "hex", "nim", "farkle", "yacht-dice", "word-scramble", "trivia-quiz", "unique-bid"];
+  const cpuIds = ["color-clash", "crazy-eights", "go-fish", "sea-battle", "connect-four", "pig", "tic-tac-toe", "guess-who", "dots-boxes", "reversi", "liars-dice", "rock-paper-scissors", "checkers", "mancala", "dominoes", "hex", "nim", "farkle", "yacht-dice", "word-scramble", "trivia-quiz", "unique-bid"];
   const tiles = () => [...document.querySelectorAll(".game-tile")].map((tile) => tile.getAttribute("href").slice(1)).sort();
   assert.equal(document.querySelector('[data-play-style="offline"]').getAttribute("aria-pressed"), "true");
   assert.deepEqual(tiles(), [...offlineIds].sort());
-  assert.match(document.querySelector(".game-count").textContent, /17 games available offline/);
-  pass("Offline copy defaults to the complete 17-game local library");
+  assert.match(document.querySelector(".game-count").textContent, /27 games available offline/);
+  pass("Offline copy defaults to the complete 27-game local library");
 
   const headerDownload = document.querySelector("[data-offline-download]");
   assert.ok(headerDownload, "Header action is present");
@@ -196,8 +196,8 @@ async function main() {
 
   document.querySelector('[data-play-style="cpu"]').click();
   assert.deepEqual(tiles(), [...cpuIds].sort());
-  assert.match(document.querySelector(".game-count").textContent, /12 games with computer opponents/);
-  pass("Vs computer filter contains all 12 local computer opponents");
+  assert.match(document.querySelector(".game-count").textContent, /22 games with computer opponents/);
+  pass("Vs computer filter contains all 22 local computer opponents");
 
   for (const id of offlineIds) {
     await visit(id);
@@ -207,7 +207,7 @@ async function main() {
     assert.equal(document.querySelectorAll(".offline-room-notice").length, 0, `${id} is playable locally`);
     assert.equal(errors.length, 0, `${id}: ${errors.map(String).join("\n")}`);
   }
-  pass("All 17 offline game routes mount with real controls from the extracted files");
+  pass("All 27 offline game routes mount with real controls from the extracted files");
 
   await visit("rock-paper-scissors");
   for (let round = 1; round <= 5; round++) {
