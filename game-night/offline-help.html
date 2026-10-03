@@ -3,40 +3,47 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="theme-color" content="#183f41" />
+    <meta name="theme-color" content="#efe5cf" />
     <meta name="description" content="Take VectorSpace with you. Download once, open locally, and enjoy solo games and computer opponents without internet." />
     <title>Play offline · VectorSpace</title>
     <link rel="icon" href="favicon.svg" type="image/svg+xml" />
     <style>
-      :root { color-scheme: light; font-family: "Segoe UI", Arial, sans-serif; color: #183337; background: #f5f4ee; }
+      /* Travel Edition rule sheet — same closet vocabulary as the main site */
+      @font-face { font-family: "VS Display"; src: url("fonts/texgyreadventor-bold.woff") format("woff"); font-weight: 700; font-display: swap; }
+      @font-face { font-family: "VS Label"; src: url("fonts/texgyreheroscn-bold.woff") format("woff"); font-weight: 700; font-display: swap; }
+      :root { color-scheme: light; --ink: #1b2230; --soft: #3d4454; --board: #efe5cf; --stock: #fffaf0; --wood: #8b5a32; --felt: #1e4a3f; --yellow: #f2b632; --red: #a8301c; --cream: #fff3d6;
+        --display: "VS Display", "Century Gothic", "Trebuchet MS", sans-serif; --label: "VS Label", "Bahnschrift Condensed", "Arial Narrow", sans-serif;
+        font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif; color: var(--ink); background: var(--board); }
       * { box-sizing: border-box; }
       body { margin: 0; }
-      a { color: inherit; text-underline-offset: 4px; }
-      a:focus-visible { outline: 3px solid #d68d21; outline-offset: 5px; }
-      .shell { max-width: 1080px; margin: auto; padding: 32px clamp(22px, 5vw, 64px) 52px; }
-      nav { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 16px; margin-bottom: 56px; font-size: 14px; }
-      .brand { font-weight: 800; letter-spacing: -.7px; font-size: 24px; text-decoration: none; }
-      .brand b { color: #b9761b; }
-      .eyebrow { color: #557561; text-transform: uppercase; font-size: 12px; font-weight: 800; letter-spacing: 2px; }
-      h1 { max-width: 700px; font: 500 clamp(40px, 7vw, 66px)/1.05 Georgia, serif; letter-spacing: -2px; margin: 18px 0 22px; }
-      .intro { max-width: 620px; color: #5c6f6f; font-size: 18px; line-height: 1.7; }
-      .steps { list-style: none; padding: 0; display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; margin: 36px 0 24px; counter-reset: step; }
-      .steps li { counter-increment: step; background: #fffefa; border: 1px solid #dde2d6; border-radius: 24px; padding: 26px; box-shadow: 0 8px 22px #233b2810; }
-      .steps li::before { content: "0" counter(step); display: grid; place-items: center; width: 44px; height: 44px; border-radius: 15px; background: #e8eddd; color: #3c624c; font-weight: 800; font-size: 15px; margin-bottom: 22px; }
-      h2 { font-size: 18px; margin: 0 0 10px; }
+      a { color: inherit; text-underline-offset: 4px; text-decoration-thickness: 2px; }
+      a:focus-visible { outline: 3px solid #2c5fd6; outline-offset: 5px; }
+      .shell { max-width: 1080px; margin: auto; padding: 28px clamp(16px, 5vw, 64px) 56px; }
+      nav { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 16px; margin-bottom: 48px; padding-bottom: 18px; border-bottom: 3px solid var(--ink); font: 700 13px/1 var(--label); letter-spacing: .1em; text-transform: uppercase; }
+      .brand { font: 700 26px/1 var(--display); letter-spacing: -.5px; text-transform: none; text-decoration: none; }
+      .brand b { color: #d6452f; }
+      .eyebrow { display: inline-block; padding: 5px 9px 4px; color: var(--ink); background: var(--yellow); border: 2px solid var(--ink); border-radius: 3px; font: 700 12px/1 var(--label); letter-spacing: .14em; text-transform: uppercase; }
+      h1 { max-width: 760px; font: 700 clamp(38px, 7vw, 68px)/.98 var(--display); letter-spacing: -.035em; margin: 18px 0 22px; }
+      .intro { max-width: 620px; color: var(--soft); font-size: 18px; line-height: 1.65; }
+      .steps { list-style: none; padding: 0; display: grid; grid-template-columns: repeat(3, 1fr); gap: 22px; margin: 40px 0 26px; counter-reset: step; }
+      .steps li { counter-increment: step; background: var(--stock); border: 2px solid var(--ink); border-radius: 4px; padding: 24px; box-shadow: 5px 5px 0 var(--ink); }
+      .steps li:nth-child(1) { transform: rotate(-.8deg); } .steps li:nth-child(3) { transform: rotate(.7deg); }
+      .steps li::before { content: counter(step); display: grid; place-items: center; width: 42px; height: 42px; border-radius: 50%; background: var(--ink); color: var(--cream); font: 700 18px/1 var(--display); margin-bottom: 18px; }
+      h2 { font: 700 20px/1.1 var(--display); letter-spacing: -.02em; margin: 0 0 10px; }
       p { line-height: 1.65; margin: 0 0 14px; }
-      .steps p { color: #647477; font-size: 14px; margin: 0; }
-      code { background: #e8eddf; padding: 3px 6px; border-radius: 5px; font-size: .9em; overflow-wrap: anywhere; }
-      .note { color: #647477; font-size: 14px; }
-      .play { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; margin-top: 38px; padding: 32px; border-radius: 26px; background: #183f41; color: #f7f5e7; }
-      .play h2 { color: #ebc36b; }
-      .play p { color: #d6e2d4; font-size: 15px; }
-      .play a { color: #f7db97; }
-      .button { display: inline-flex; align-items: center; justify-content: center; gap: 12px; text-decoration: none; background: #f6c25f; color: #273b2c; border: 1px solid #d6a148; box-shadow: 0 3px 0 #bb8f40; border-radius: 14px; padding: 13px 20px; font-size: 14px; font-weight: 700; transition: transform .15s; }
-      .button:hover { transform: translateY(-2px); }
-      .finish { margin-top: 28px; display: flex; gap: 20px; flex-wrap: wrap; align-items: center; }
+      .steps p { color: var(--soft); font-size: 14.5px; margin: 0; }
+      code { background: #f2e3c2; border: 1.5px solid var(--ink); padding: 2px 6px; border-radius: 3px; font-size: .9em; overflow-wrap: anywhere; }
+      .note { color: var(--soft); font-size: 14.5px; }
+      .play { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; margin-top: 40px; padding: 32px; border: 9px solid var(--wood); border-radius: 18px; box-shadow: 0 0 0 2px var(--ink), 6px 7px 0 2px var(--ink); background: radial-gradient(130% 100% at 30% 0%, #ffffff14, transparent 60%), var(--felt); color: var(--cream); }
+      .play h2 { color: var(--yellow); }
+      .play p { color: #dbe9df; font-size: 15px; }
+      .play a { color: var(--yellow); }
+      .button { display: inline-flex; align-items: center; justify-content: center; gap: 10px; min-height: 48px; text-decoration: none; background: var(--yellow); color: var(--ink); border: 2px solid var(--ink); box-shadow: 0 4px 0 var(--ink); border-radius: 6px; padding: 0 20px; font: 700 15px/1 var(--label); letter-spacing: .08em; text-transform: uppercase; transition: transform .14s, box-shadow .14s; }
+      .button:hover { transform: translateY(-2px); box-shadow: 0 6px 0 var(--ink); }
+      .button:active { transform: translateY(4px); box-shadow: 0 0 0 var(--ink); }
+      .finish { margin-top: 30px; display: flex; gap: 20px; flex-wrap: wrap; align-items: center; }
       .finish p { margin: 0; flex: 1 1 260px; }
-      @media (max-width: 700px) { nav { margin-bottom: 36px; } .steps, .play { grid-template-columns: 1fr; } .steps li { padding: 22px; } .steps li::before { margin-bottom: 14px; } .play { padding: 26px; gap: 18px; } }
+      @media (max-width: 700px) { nav { margin-bottom: 32px; } .steps, .play { grid-template-columns: 1fr; } .steps li { padding: 20px; transform: none !important; } .play { padding: 24px; gap: 18px; border-width: 6px; } }
       @media (prefers-reduced-motion: reduce) { .button { transition: none; } }
     </style>
   </head>
@@ -49,7 +56,7 @@
       <main>
         <div class="eyebrow">Good games, anywhere</div>
         <h1>A little friendly competition.<br />Even offline.</h1>
-        <p class="intro">Save the collection once and bring <strong>17 offline games</strong> with you, including <strong>12 with computer opponents</strong>. No account, app installation, or internet needed to play locally.</p>
+        <p class="intro">Save the collection once and bring <strong>27 offline games</strong> with you, including <strong>22 with computer opponents</strong>. No account, app installation, or internet needed to play locally.</p>
         <ol class="steps">
           <li><h2>Download the collection</h2><p>Use <strong>Download offline</strong> on the home page. Save the VectorSpace ZIP somewhere you can find it.</p></li>
           <li><h2>Extract the whole ZIP</h2><p>On Windows, right-click and choose <strong>Extract All</strong>. On a Mac, double-click the ZIP. Keep all the extracted files together.</p></li>
