@@ -151,6 +151,26 @@
         }
         render();
       }
+      // Hard: score every four-in-a-row window after the drop (own lines up, rival lines down).
+      function bestColumn(pool) {
+        const lines = [];
+        for (let r = 0; r < 6; r++) for (let c = 0; c < 7; c++) for (const [dr, dc] of [[0, 1], [1, 0], [1, 1], [1, -1]]) {
+          const cells = [0, 1, 2, 3].map((k) => [r + dr * k, c + dc * k]);
+          if (cells.every(([y, x]) => y >= 0 && y < 6 && x >= 0 && x < 7)) lines.push(cells.map(([y, x]) => y * 7 + x));
+        }
+        const value = (b) => lines.reduce((sum, line) => {
+          const mine = line.filter((i) => b[i] === 2).length, theirs = line.filter((i) => b[i] === 1).length;
+          if (mine && theirs) return sum;
+          return sum + [0, 1, 6, 30][mine] - [0, 1, 7, 40][theirs];
+        }, 0);
+        let best = pool[0], bestScore = -Infinity;
+        for (const c of pool) {
+          const b = [...board]; b[row(b, c) * 7 + c] = 2;
+          const score = value(b) - Math.abs(3 - c) + Math.random() * 0.5;
+          if (score > bestScore) { bestScore = score; best = c; }
+        }
+        return best;
+      }
       function ai() {
         const cols = [3, 2, 4, 1, 5, 0, 6].filter((c) => row(board, c) >= 0);
         let choice;
@@ -162,6 +182,8 @@
           });
           if (choice !== undefined) break;
         }
+        if (choice !== undefined && G.cpu.slip(0.35)) choice = undefined;
+        if (choice === undefined && G.cpu.slip(0.5)) choice = cols[rand(cols.length)];
         if (choice === undefined) {
           const safe = cols.filter((c) => {
             let b = [...board];
@@ -174,9 +196,8 @@
               return winner(t, 1).length;
             });
           });
-          choice = (safe.length ? safe : cols)[
-            rand(Math.min(3, (safe.length ? safe : cols).length))
-          ];
+          const pool = safe.length ? safe : cols;
+          choice = G.cpu.hard() ? bestColumn(pool) : pool[rand(Math.min(3, pool.length))];
         }
         busy = false;
         drop(choice);
@@ -282,6 +303,7 @@
                     choice = j;
                   }
                 }
+              if (G.cpu.slip(0.45)) { const open = board.map((m, k) => m ? -1 : k).filter((k) => k >= 0); choice = open[rand(open.length)]; }
               busy = false;
               move(choice);
             }, 450);
@@ -421,7 +443,10 @@
       }
       function ai() {
         if (done || turn !== 1 || mode !== "ai") return;
-        if (bank >= 20 || scores[1] + bank >= 100) {
+        // Easy banks early; hard pushes when behind and plays safe when ahead.
+        const lead = scores[1] - scores[0];
+        const target = G.cpu.level === "easy" ? 12 : G.cpu.hard() ? (scores[0] >= 80 ? 35 : lead >= 25 ? 15 : lead <= -25 ? 28 : 22) : 20;
+        if (bank >= target || scores[1] + bank >= 100) {
           hold();
           return;
         }
@@ -500,7 +525,10 @@
       }
       function ai() {
         let options = targets.filter((i) => !aiShots.includes(i));
+        if (G.cpu.slip(0.6)) options = [];
         let i = options.length ? options[0] : rand(100);
+        // Hard hunts on a checkerboard: every ship covers at least one dark square.
+        if (!options.length && G.cpu.hard()) { const open = Array.from({ length: 100 }, (_, k) => k).filter((k) => !aiShots.includes(k) && (Math.floor(k / 10) + k % 10) % 2 === 0); if (open.length) i = open[rand(open.length)]; }
         while (aiShots.includes(i)) i = rand(100);
         targets = targets.filter((n) => n !== i);
         aiShots.push(i);

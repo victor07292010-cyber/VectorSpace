@@ -279,11 +279,11 @@
   }
   function choose(id, v, random = Math.random) {
     if (!active(v)) return null;
-    if (id === "checkers") return searchMove(checkers, v, s => checkerSteps(s, s.turn), checkerScore, 3, random);
+    if (id === "checkers") return searchMove(checkers, v, s => checkerSteps(s, s.turn), checkerScore, G.cpu?.hard() ? 5 : 3, random);
     if (id === "mancala") return searchMove(mancala, v, mancalaMoves, (s, me) => {
       if (s.done) return s.winners.length > 1 ? 0 : s.winners[0] === me ? 10000 : -10000;
       return (s.pits[me * 7 + 6] - s.pits[(1 - me) * 7 + 6]) * 8 + s.pits.slice(me * 7, me * 7 + 6).reduce((a, b) => a + b, 0) - s.pits.slice((1 - me) * 7, (1 - me) * 7 + 6).reduce((a, b) => a + b, 0);
-    }, 4, random);
+    }, G.cpu?.hard() ? 7 : 4, random);
     if (id === "dominoes") {
       const moves = dominoMoves(v);
       if (!moves.length) return { type: v.boneyardCount ? "draw" : "pass" };
@@ -333,7 +333,8 @@
           if (disposed || timer !== null || state.done || state.turn !== 1) return;
           timer = setTimeout(() => {
             timer = null; if (disposed) return;
-            const action = choose(id, engine.view(state, 1));
+            const base = () => choose(id, engine.view(state, 1));
+            const action = G.cpu ? G.cpu.decide(engine, state, 1, base) : base();
             if (action) apply(1, action);
             render(); schedule();
           }, 500);

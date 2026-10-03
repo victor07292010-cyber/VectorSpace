@@ -107,6 +107,12 @@
       function ai() {
         if (done) return;
         let i = hands[1].findIndex((c) => valid(c) && c.rank !== 8);
+        if (G.cpu.hard()) {
+          // Hard: play from the suit it holds most of, so it keeps options; eights stay saved.
+          const sameSuit = (c) => hands[1].filter((d) => d.suit === c.suit).length;
+          hands[1].forEach((c, k) => { if (valid(c) && c.rank !== 8 && (i < 0 || sameSuit(c) > sameSuit(hands[1][i]))) i = k; });
+        }
+        if (G.cpu.slip()) { const ok = hands[1].map((c, k) => valid(c) ? k : -1).filter((k) => k >= 0); if (ok.length) i = ok[rand(ok.length)]; }
         if (i < 0) i = hands[1].findIndex(valid);
         while (i < 0 && stock.length) {
           hands[1].push(stock.pop());
@@ -304,6 +310,11 @@
       function ai() {
         if (done) return;
         let i = hands[1].findIndex((c) => c.color !== "wild" && valid(c));
+        if (G.cpu.hard()) {
+          const sameColor = (c) => hands[1].filter((d) => d.color === c.color).length;
+          hands[1].forEach((c, k) => { if (c.color !== "wild" && valid(c) && (i < 0 || sameColor(c) > sameColor(hands[1][i]))) i = k; });
+        }
+        if (G.cpu.slip()) { const ok = hands[1].map((c, k) => valid(c) ? k : -1).filter((k) => k >= 0); if (ok.length) i = ok[rand(ok.length)]; }
         if (i < 0) i = hands[1].findIndex(valid);
         if (i < 0) {
           let c = drawOne();
@@ -432,7 +443,10 @@
             "",
           )}</div><div class="books">${books[0].map((r) => `<span class="book">${rank(r)} × 4</span>`).join("") || '<span class="book empty">Your collected books will appear here</span>'}</div>`;
       }
+      const askedByYou = [];
       function ask(p, r) {
+        const at = askedByYou.indexOf(r);
+        if (p === 1 && at >= 0) askedByYou.splice(at, 1);
         let q = 1 - p,
           found = hands[q].filter((c) => c.rank === r),
           again = false;
@@ -488,6 +502,9 @@
         }
         let ranks = [...new Set(hands[1].map((c) => c.rank))],
           r = ranks[rand(ranks.length)];
+        // Hard: remembers what you asked for — you still hold those.
+        const remembered = ranks.filter((k) => askedByYou.includes(k));
+        if (G.cpu.hard() && remembered.length) r = remembered[rand(remembered.length)];
         let again = ask(1, r);
         begin(again ? 1 : 0);
       }
@@ -495,6 +512,7 @@
         if (a === "ask" && !busy && !done) {
           let r = +b.dataset.rank;
           if (!hands[0].some((c) => c.rank === r)) return;
+          if (!askedByYou.includes(r)) askedByYou.push(r);
           let again = ask(0, r);
           begin(again ? 0 : 1);
         }

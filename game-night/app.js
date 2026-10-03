@@ -151,11 +151,13 @@
     timers.add(t);
   };
   G.catalog = entries;
+  const countBadge = document.querySelector("[data-game-count]");
+  if (countBadge) countBadge.textContent = String(entries.length);
   const localCopy = location.protocol === "file:";
   const liveUrl = "https://vectorspaceinternationaldevelopment.online/";
   const cpuGames = new Set(['color-clash','crazy-eights','go-fish','sea-battle','connect-four','pig','tic-tac-toe','guess-who','dots-boxes','reversi','liars-dice','rock-paper-scissors', ...(G.cpuIds || [])]);
   const offlineCount = entries.filter(e => G.games[e[0]]).length;
-  const newIds = new Set((G.expansionCatalog || []).map(e => e[0]));
+  const newIds = new Set(G.partyNightIds || (G.expansionCatalog || []).map(e => e[0]));
   const capacity = id => window.RoomGames?.games[id];
   const reduceMotion = () => window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
 
@@ -283,6 +285,7 @@
     timers.clear();
     spinning = false;
     app.onclick = null;
+    G.tableToolsDetach?.();
     document.body.dataset.view = "";
     const id = location.hash.slice(1),
       entry = entries.find((e) => e[0] === id),
@@ -316,6 +319,7 @@
     };
     document.querySelector("#restart").onclick = restart;
     restart();
+    G.tableTools?.(app.querySelector(".game-page"), id, { restart, vsCpu: cpuGames.has(id) });
     window.scrollTo(0, 0);
   }
   window.addEventListener("hashchange", route);

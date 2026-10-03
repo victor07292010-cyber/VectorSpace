@@ -371,7 +371,7 @@
         let state = null, timer = null, disposed = false, opponents = 2, renderedKey = "", notice = "";
         function start() { clearTimeout(timer); timer = null; state = engine.create([{ id: "you", name: "You" }, ...Array.from({ length: opponents }, (_, i) => ({ id: `cpu-${i}`, name: ["Atlas", "Nova", "Orbit", "Pixel", "Echo", "Comet", "Sol"][i] }))]); notice = ""; renderedKey = ""; render(); schedule(); }
         function apply(actor, action) { const next = copy(state); if (!engine.act(next, actor, action)) return false; state = next; return true; }
-        function cpuMove() { for (let i = 1; i < state.players.length; i++) { const action = choose(id, engine.view(state, i)); if (action) return [i, action]; } return null; }
+        function cpuMove() { for (let i = 1; i < state.players.length; i++) { const base = () => choose(id, engine.view(state, i)); const action = G.cpu ? G.cpu.decide(engine, state, i, base) : base(); if (action) return [i, action]; } return null; }
         function schedule() {
           if (disposed || timer !== null || !cpuMove()) return;
           timer = setTimeout(() => { timer = null; if (disposed) return; const move = cpuMove(); if (move) apply(...move); render(); schedule(); }, 430);

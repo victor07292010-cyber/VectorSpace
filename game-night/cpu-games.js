@@ -373,7 +373,8 @@
           timer = setTimeout(() => {
             timer = null;
             if (disposed) return;
-            const action = choose(id, engine.view(state, 1));
+            const base = () => choose(id, engine.view(state, 1));
+            const action = G.cpu ? G.cpu.decide(engine, state, 1, base) : base();
             if (action) apply(1, action);
             render();
             schedule();

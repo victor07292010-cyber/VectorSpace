@@ -4,8 +4,8 @@ window.GameNightOnline = (() => {
   let root=null,unsubscribe=null,preferred='color-clash',notice='',noticeTimer=null,drawing=null;
   let brushColor='#173b35',brushWidth='6';
   const icons={'color-clash':'✳','crazy-eights':'8','go-fish':'♦','shut-box':'⚄','solitaire':'♠','sea-battle':'⌖','spectrum':'◴','connect-four':'●','memory':'✿','pig':'⚅','tic-tac-toe':'×','higher-lower':'↕'};
-  const order=['trivia-quiz','word-scramble','unique-bid','farkle','yacht-dice','checkers','mancala','dominoes','hex','nim','imposter','pictionary','guess-who','mafia','color-clash','crazy-eights','go-fish','sea-battle','spectrum','liars-dice','dots-boxes','reversi','rock-paper-scissors','shut-box','connect-four','memory','pig','tic-tac-toe','higher-lower','solitaire'];
-  Object.assign(icons,{'trivia-quiz':'?','word-scramble':'Aa','unique-bid':'#','farkle':'⚅','yacht-dice':'⚄','checkers':'♛','mancala':'◌','dominoes':'⚁','hex':'⬡','nim':'⋮','imposter':'◉','pictionary':'✎','guess-who':'◈','mafia':'♜','dots-boxes':'▦','reversi':'◐','rock-paper-scissors':'✌','liars-dice':'⚂'});
+  const order=[...(G.partyNightIds||[]),'trivia-quiz','word-scramble','unique-bid','farkle','yacht-dice','checkers','mancala','dominoes','hex','nim','imposter','pictionary','guess-who','mafia','color-clash','crazy-eights','go-fish','sea-battle','spectrum','liars-dice','dots-boxes','reversi','rock-paper-scissors','shut-box','connect-four','memory','pig','tic-tac-toe','higher-lower','solitaire'];
+  (G.expansionCatalog||[]).forEach(e=>{icons[e[0]]=e[6];});Object.assign(icons,{'trivia-quiz':'?','word-scramble':'Aa','unique-bid':'#','farkle':'⚅','yacht-dice':'⚄','checkers':'♛','mancala':'◌','dominoes':'⚁','hex':'⬡','nim':'⋮','imposter':'◉','pictionary':'✎','guess-who':'◈','mafia':'♜','dots-boxes':'▦','reversi':'◐','rock-paper-scissors':'✌','liars-dice':'⚂'});
   function name(){try{return localStorage.getItem('gn-name')||'';}catch{return '';}}
   function saveName(n){try{localStorage.setItem('gn-name',n);}catch{}}
   function avatar(p,i){return `<span class="player-avatar avatar-${i%6}" aria-hidden="true">${G.esc(p.name.slice(0,1).toUpperCase())}</span>`;}

@@ -1,0 +1,219 @@
+/* ==========================================================================
+   Party Night — twenty online party games, printed on Game Closet stock.
+   Every game sits on a score-pad mat laid over the felt table.
+   ========================================================================== */
+
+.pn-game {
+  --pn-line: #1b223026;
+  position: relative; display: grid; gap: 16px; min-width: 0;
+  margin-top: 4px; padding: clamp(14px, 3vw, 28px);
+  color: var(--ink); background: var(--stock);
+  background-image: repeating-linear-gradient(180deg, transparent 0 31px, #2c5fd614 31px 32px);
+  border: 2px solid var(--ink); border-radius: 8px; box-shadow: 5px 5px 0 #00000059;
+  font-size: 1rem; line-height: 1.45; overflow-wrap: anywhere;
+}
+.pn-game > * { min-width: 0; margin: 0; }
+.pn-game .game-status { margin: 0; color: var(--ink); background: var(--cream); border: 2px solid var(--ink); }
+.pn-game .game-status.finished { background: var(--yellow); }
+.pn-eyebrow { display: block; font: 700 .7rem/1.2 var(--label); letter-spacing: .12em; text-transform: uppercase; color: var(--red-ink); }
+.pn-h { margin: 0; font: 700 1.15rem/1.15 var(--display); letter-spacing: -.02em; }
+.pn-note { margin: 0; color: var(--ink-soft); font-size: .92rem; }
+.pn-waiting { margin: 0; font: 400 1rem/1.3 var(--pencil); color: var(--ink-soft); }
+.pn-round { justify-self: start; padding: 4px 10px; font: 700 .72rem/1.2 var(--label); letter-spacing: .12em; text-transform: uppercase; color: var(--cream); background: var(--ink); border-radius: 3px; transform: rotate(-1.5deg); }
+
+/* Score strip: pawns lined up along the edge of the board */
+.pn-scores { display: flex; flex-wrap: wrap; gap: 8px; margin: 0; padding: 0; list-style: none; }
+.pn-scores li { display: flex; align-items: center; gap: 7px; min-width: 0; padding: 5px 10px 5px 5px; background: #fff; border: 2px solid var(--ink); border-radius: 999px; box-shadow: 0 3px 0 var(--ink); }
+.pn-scores li.is-turn { background: var(--yellow); }
+.pn-scores li.is-me .pn-name { text-decoration: underline 2px; text-underline-offset: 3px; }
+.pn-scores li.is-winner { background: var(--yellow); box-shadow: 0 3px 0 var(--ink), 0 0 0 3px #f2b63266; }
+.pn-scores li.is-out { opacity: .5; }
+.pn-scores .pn-name { max-width: 9em; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 600; font-size: .9rem; }
+.pn-scores .pn-name small { font: 700 .62rem/1 var(--label); letter-spacing: .08em; text-transform: uppercase; color: var(--ink-soft); }
+.pn-scores b { font: 700 1rem/1 var(--display); }
+.pn-mark { font: 700 .7rem/1 var(--label); letter-spacing: .06em; color: var(--green); }
+.pn-pawn { flex: 0 0 auto; display: grid; place-items: center; width: 26px; height: 26px; font: 700 .78rem/1 var(--display); color: #fff; background: var(--pawn, var(--ink)); border: 2px solid var(--ink); border-radius: 50%; }
+.pawn-0 { --pawn: #d6452f; } .pawn-1 { --pawn: #2c5fd6; } .pawn-2 { --pawn: #2f8a58; } .pawn-3 { --pawn: #c48a00; }
+.pawn-4 { --pawn: #8a4fbf; } .pawn-5 { --pawn: #d4558a; } .pawn-6 { --pawn: #8a5a35; } .pawn-7 { --pawn: #26334a; }
+.pawn-ink-0 { --ink-c: #d6452f; } .pawn-ink-1 { --ink-c: #2c5fd6; } .pawn-ink-2 { --ink-c: #2f8a58; } .pawn-ink-3 { --ink-c: #a77600; }
+.pawn-ink-4 { --ink-c: #8a4fbf; } .pawn-ink-5 { --ink-c: #c4457a; } .pawn-ink-6 { --ink-c: #8a5a35; } .pawn-ink-7 { --ink-c: #26334a; }
+
+/* The prompt: a big printed card dealt onto the mat */
+.pn-prompt { position: relative; padding: 18px 20px 20px; background: #fff; border: 2px solid var(--ink); border-radius: 10px; box-shadow: 4px 4px 0 var(--ink); transform: rotate(-.4deg); }
+.pn-prompt::after { content: ""; position: absolute; inset: 6px; border: 1.5px dashed #1b223030; border-radius: 6px; pointer-events: none; }
+.pn-prompt.is-secret { background: var(--ink); color: var(--cream); }
+.pn-prompt.is-secret .pn-eyebrow { color: var(--yellow); }
+.pn-big { margin-top: 6px; font: 700 clamp(1.25rem, 3.4vw, 1.9rem)/1.18 var(--display); letter-spacing: -.02em; }
+.pn-prompt p { margin: 10px 0 0; color: inherit; opacity: .85; }
+.pn-blank { display: inline-block; min-width: 3.5em; border-bottom: 3px solid var(--red); color: transparent; }
+.pn-word { font-size: 1.15em; font-style: italic; }
+.pn-tiles { display: inline-flex; flex-wrap: wrap; gap: 6px; vertical-align: middle; }
+.pn-tiles b { display: grid; place-items: center; min-width: 1.6em; height: 1.75em; padding: 0 .2em; font: 700 1em/1 var(--display); color: var(--ink); background: var(--cream); border: 2px solid var(--ink); border-radius: 5px; box-shadow: 0 3px 0 var(--ink); }
+.pn-math { font-variant-numeric: tabular-nums; }
+.pn-math b { color: var(--green); }
+.pn-emoji { font-size: clamp(2.2rem, 7vw, 3.4rem); letter-spacing: .08em; line-height: 1.2; }
+
+/* Forms: pencil-on-pad inputs */
+.pn-form { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 10px 12px; }
+.pn-form.pn-stack, .pn-form.pn-grid2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr)); align-items: end; }
+.pn-form > .button { flex: 0 0 auto; }
+.pn-field { display: grid; gap: 5px; flex: 1 1 240px; min-width: 0; }
+.pn-field > span { font: 700 .72rem/1.2 var(--label); letter-spacing: .1em; text-transform: uppercase; color: var(--ink-soft); }
+.pn-field input, .pn-field select {
+  box-sizing: border-box; width: 100%; min-height: 46px; padding: 8px 12px;
+  font: 500 1.05rem/1.2 var(--body); color: var(--ink); background: #fff;
+  border: 2px solid var(--ink); border-radius: 6px; box-shadow: inset 0 3px 0 #1b223014;
+}
+.pn-field input:focus, .pn-field select:focus { outline: 3px solid var(--yellow); outline-offset: 1px; }
+.pn-force { justify-self: start; font-size: .85rem; }
+.pn-force summary { cursor: pointer; font: 700 .72rem/1.2 var(--label); letter-spacing: .1em; text-transform: uppercase; color: var(--ink-soft); }
+.pn-force[open] { display: grid; gap: 8px; padding: 10px 12px; background: var(--cream); border: 2px dashed #1b223066; border-radius: 6px; }
+.pn-force[open] .button { justify-self: start; }
+
+/* Answer cards: a hand of options to vote on */
+.pn-options { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 220px), 1fr)); gap: 10px; }
+.pn-option {
+  position: relative; display: flex; flex-wrap: wrap; align-items: center; gap: 4px 10px; min-height: 58px; padding: 10px 12px;
+  text-align: left; font: 600 1rem/1.3 var(--body); color: var(--ink); background: #fff;
+  border: 2px solid var(--ink); border-radius: 8px; box-shadow: 0 4px 0 var(--ink);
+}
+button.pn-option { cursor: pointer; transition: transform .12s var(--press), box-shadow .12s var(--press), background .12s; }
+button.pn-option:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 6px 0 var(--ink); background: var(--cream); }
+button.pn-option:active:not(:disabled) { transform: translateY(3px); box-shadow: 0 1px 0 var(--ink); }
+button.pn-option:disabled { cursor: default; opacity: .6; }
+.pn-option.is-picked { background: var(--yellow); }
+.pn-option.is-real { background: #dff1e6; border-color: var(--green); box-shadow: 0 4px 0 var(--green); }
+.pn-option small { flex-basis: 100%; font: 700 .7rem/1.2 var(--label); letter-spacing: .08em; text-transform: uppercase; color: var(--ink-soft); }
+.pn-letter { flex: 0 0 auto; display: grid; place-items: center; width: 28px; height: 28px; font: 700 .85rem/1 var(--display); color: var(--cream); background: var(--ink); border-radius: 6px; }
+.pn-options.is-reveal .pn-letter { background: var(--red); }
+.pn-people .pn-option { min-height: 50px; }
+
+/* This or That */
+.pn-versus { display: grid; grid-template-columns: 1fr auto 1fr; align-items: stretch; gap: 10px; }
+.pn-side { display: grid; align-content: center; gap: 4px; padding: 16px; text-align: center; background: #fff; border: 2px solid var(--ink); border-radius: 10px; box-shadow: 4px 4px 0 var(--ink); }
+.pn-side.side-a { background: #fde4dd; transform: rotate(-1deg); }
+.pn-side.side-b { background: #dde7fb; transform: rotate(1deg); }
+.pn-side span { font: 700 .7rem/1 var(--label); letter-spacing: .12em; text-transform: uppercase; color: var(--ink-soft); }
+.pn-side strong { font: 700 clamp(1.05rem, 3vw, 1.45rem)/1.15 var(--display); }
+.pn-side b { font: 700 1.6rem/1 var(--display); }
+.pn-or { align-self: center; display: grid; place-items: center; width: 40px; height: 40px; font: 700 .8rem/1 var(--label); text-transform: uppercase; color: var(--cream); background: var(--red); border: 2px solid var(--ink); border-radius: 50%; }
+
+/* Lists, groups and reveals */
+.pn-list, .pn-feed ul, .pn-chat ol, .pn-places ul { margin: 0; padding-left: 20px; }
+.pn-list li, .pn-feed li, .pn-chat li { margin: 4px 0; }
+.pn-groups { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 200px), 1fr)); gap: 10px; }
+.pn-group { display: grid; gap: 4px; padding: 10px 12px; background: #fff; border: 2px solid var(--ink); border-radius: 8px; }
+.pn-group.is-top { background: var(--yellow); box-shadow: 0 4px 0 var(--ink); }
+.pn-group span { font-size: .88rem; color: var(--ink-soft); }
+.pn-group.is-top span { color: var(--ink); }
+.pn-feed, .pn-chat { padding: 12px 14px; background: #fff; border: 2px solid var(--ink); border-radius: 8px; }
+.pn-feed .pn-h, .pn-chat .pn-h { margin-bottom: 6px; font-size: 1rem; }
+.pn-taboo { justify-self: center; display: grid; gap: 6px; width: min(100%, 300px); padding: 16px; text-align: center; background: #fff; border: 3px solid var(--ink); border-radius: 12px; box-shadow: 5px 5px 0 var(--ink); }
+.pn-taboo > strong { padding: 8px; font: 700 1.6rem/1.1 var(--display); color: var(--cream); background: var(--blue); border-radius: 6px; }
+.pn-taboo ul { margin: 0; padding: 0; list-style: none; display: grid; gap: 4px; }
+.pn-taboo li { padding: 4px; font-weight: 700; color: var(--red-ink); border-bottom: 1.5px dashed #d6452f55; text-decoration: line-through 2px; }
+
+/* Letter Ladder: a chain of words in each player's ink */
+.pn-ladder { display: flex; flex-wrap: wrap; gap: 6px; }
+.pn-ladder span { padding: 5px 10px; font-weight: 700; color: var(--ink-c, var(--ink)); background: #fff; border: 2px solid currentColor; border-radius: 5px; }
+.pn-ladder span:last-child { color: #fff; background: var(--ink-c, var(--ink)); border-color: var(--ink); box-shadow: 0 3px 0 var(--ink); }
+
+/* Alphabet Sprint answer sheet */
+.pn-sheet-wrap { overflow-x: auto; border: 2px solid var(--ink); border-radius: 8px; background: #fff; }
+.pn-sheet { width: 100%; border-collapse: collapse; font-size: .92rem; }
+.pn-sheet th, .pn-sheet td { padding: 6px 8px; text-align: left; border-bottom: 1.5px solid var(--pn-line); vertical-align: middle; }
+.pn-sheet thead th { font: 700 .7rem/1.2 var(--label); letter-spacing: .1em; text-transform: uppercase; background: var(--cream); }
+.pn-sheet tbody th { font-weight: 700; white-space: nowrap; }
+.pn-cell { width: 100%; min-height: 36px; padding: 4px 8px; text-align: left; font: 600 .9rem/1.2 var(--body); color: var(--ink); background: transparent; border: 1.5px dashed #1b223040; border-radius: 5px; cursor: pointer; }
+.pn-cell:hover:not(:disabled) { background: var(--cream); }
+.pn-cell.is-vetoed { color: var(--red-ink); text-decoration: line-through 2px; background: #fde4dd; border-color: var(--red); }
+.pn-cell:disabled { cursor: default; border-color: transparent; }
+.pn-sheet .is-empty { color: #1b223060; }
+
+/* Folded Story */
+.pn-stories { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 260px), 1fr)); gap: 12px; }
+.pn-story { display: grid; align-content: start; gap: 8px; padding: 14px 16px; background: #fff; border: 2px solid var(--ink); border-radius: 4px; box-shadow: 4px 4px 0 #1b223040; background-image: repeating-linear-gradient(180deg, transparent 0 25px, #2c5fd61f 25px 26px); }
+.pn-story:nth-child(even) { transform: rotate(.6deg); }
+.pn-story:nth-child(odd) { transform: rotate(-.6deg); }
+.pn-story.is-picked { outline: 4px solid var(--yellow); }
+.pn-story p { margin: 0; font: 400 1.02rem/1.55 var(--pencil); }
+
+/* Doodle Decoy shared canvas */
+.pn-canvas { display: block; width: 100%; max-width: 800px; height: auto; aspect-ratio: 5 / 3; margin: 0 auto; background: #fff; border: 2px solid var(--ink); border-radius: 6px; box-shadow: 4px 4px 0 var(--ink); touch-action: none; }
+
+/* Heist Crew mission track */
+.pn-heist-track { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; }
+.pn-heist-track > span { display: grid; place-items: center; width: 54px; height: 54px; font: 700 1.05rem/1 var(--display); background: #fff; border: 2px solid var(--ink); border-radius: 50%; box-shadow: 0 4px 0 var(--ink); }
+.pn-heist-track > span.is-win { color: #fff; background: var(--green); }
+.pn-heist-track > span.is-fail { color: #fff; background: var(--red); }
+.pn-heist-track > span.is-now { background: var(--yellow); }
+
+/* Fib Pile cards */
+.pn-fib { display: grid; grid-template-columns: auto 1fr; gap: 16px; align-items: center; }
+.pn-pile { display: grid; justify-items: center; gap: 6px; text-align: center; }
+.pn-pile b { font: 700 1.4rem/1 var(--display); }
+.pn-stack-cards { position: relative; width: 58px; height: 80px; }
+.pn-stack-cards::before, .pn-stack-cards::after { content: ""; position: absolute; inset: 0; border: 2px solid var(--ink); border-radius: 6px; background: repeating-linear-gradient(45deg, var(--red) 0 6px, #b8331f 6px 12px); box-shadow: 0 3px 0 var(--ink); }
+.pn-stack-cards::before { transform: rotate(-6deg) translate(-4px, 2px); }
+.pn-hand > div, .pn-reveal-cards { display: flex; flex-wrap: wrap; gap: 6px; }
+.pn-hand { display: grid; gap: 8px; }
+.pn-mini-card { display: inline-grid; place-items: center; align-content: center; width: 44px; height: 62px; padding: 0; font: 700 1rem/1 var(--display); color: var(--ink); background: #fff; border: 2px solid var(--ink); border-radius: 6px; box-shadow: 0 3px 0 var(--ink); }
+.pn-mini-card small { font-size: .9rem; }
+.pn-mini-card.red { color: var(--red); }
+button.pn-mini-card { cursor: pointer; transition: transform .12s var(--press); }
+button.pn-mini-card:hover:not(:disabled) { transform: translateY(-3px); }
+button.pn-mini-card:disabled { cursor: default; }
+.pn-mini-card.is-picked { transform: translateY(-8px); background: var(--yellow); }
+.pn-reveal-cards { align-items: center; padding: 10px 12px; border: 2px solid var(--ink); border-radius: 8px; }
+.pn-reveal-cards.is-lie { background: #fde4dd; }
+.pn-reveal-cards.is-true { background: #dff1e6; }
+.pn-reveal-cards .pn-eyebrow { width: 100%; font-size: .9rem; }
+
+/* Off the Map */
+.pn-places summary { cursor: pointer; font: 700 .76rem/1.2 var(--label); letter-spacing: .1em; text-transform: uppercase; }
+.pn-places ul { columns: 2 150px; margin-top: 8px; font-size: .9rem; }
+.pn-places li.is-real { font-weight: 700; color: var(--green); }
+
+/* Final standings: a podium card */
+.pn-final { padding: 16px 18px; background: var(--cream); border: 2px solid var(--ink); border-radius: 10px; box-shadow: 5px 5px 0 var(--ink); }
+.pn-final ol { display: grid; gap: 6px; margin: 10px 0 0; padding: 0; list-style: none; }
+.pn-final li { display: grid; grid-template-columns: 28px 26px 1fr auto; align-items: center; gap: 10px; padding: 6px 10px; background: #fff; border: 2px solid var(--ink); border-radius: 6px; }
+.pn-final li.is-winner { background: var(--yellow); }
+.pn-final li strong { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pn-final li b { font: 700 1.1rem/1 var(--display); }
+.pn-place { font: 700 1.05rem/1 var(--display); text-align: center; }
+
+@media (max-width: 520px) {
+  .pn-versus { grid-template-columns: 1fr; }
+  .pn-or { justify-self: center; }
+  .pn-side.side-a, .pn-side.side-b { transform: none; }
+  .pn-fib { grid-template-columns: 1fr; justify-items: start; }
+  .pn-form > .button { flex: 1 1 100%; }
+  .pn-mini-card { width: 40px; height: 56px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .pn-prompt, .pn-story, .pn-side.side-a, .pn-side.side-b, .pn-round { transform: none !important; }
+  button.pn-option, button.pn-mini-card { transition: none; }
+}
+.pn-heist-track > span { position: relative; align-content: center; }
+.pn-heist-track > span small { display: block; font: 700 .58rem/1 var(--label); letter-spacing: .04em; }
+.pn-heist-track em { flex-basis: 100%; text-align: center; font: 700 .72rem/1.2 var(--label); font-style: normal; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-soft); }
+
+/* Secret role: a sealed envelope you peek into */
+.pn-game .pn-secret { margin: 0; padding: 0; background: var(--ink); color: var(--cream); border: 2px solid var(--ink); border-radius: 8px; box-shadow: 4px 4px 0 #1b223059; }
+.pn-game .pn-secret summary { padding: 12px 16px; cursor: pointer; font: 700 .78rem/1.2 var(--label); letter-spacing: .12em; text-transform: uppercase; color: var(--yellow); background: repeating-linear-gradient(135deg, transparent 0 10px, #ffffff0d 10px 20px); }
+.pn-game .pn-secret[open] summary { border-bottom: 2px dashed #fff3d633; }
+.pn-game .pn-secret .privacy-card { margin: 12px; padding: 14px 16px; color: var(--ink); background: var(--cream); border: 2px solid var(--ink); border-radius: 6px; box-shadow: none; }
+.pn-game .pn-secret .privacy-card h3 { margin: 0 0 6px; font: 700 1.4rem/1.15 var(--display); color: var(--ink); }
+.pn-game .pn-secret .privacy-card p { margin: 4px 0 0; color: var(--ink-soft); }
+@media (min-width: 700px) { .pn-chat ol { columns: 2; column-gap: 32px; } }
+/* Buttons printed on the score pad (the felt's light-on-dark variants don't apply here) */
+.pn-game .button.secondary { color: var(--ink); background: #fff; border: 2px solid var(--ink); box-shadow: 0 4px 0 var(--ink); opacity: 1; }
+.pn-game .button.secondary:hover:not(:disabled) { background: var(--cream); }
+.pn-game .button:disabled { opacity: .45; }
+.pn-game button.pn-mini-card:disabled { opacity: 1; }
+.pn-scores b small { font: 700 .62rem/1 var(--label); letter-spacing: .06em; text-transform: uppercase; color: var(--ink-soft); }
+/* The answer sheet scrolls sideways inside its frame on narrow screens instead of crushing columns */
+.pn-sheet th, .pn-sheet td { min-width: 92px; word-break: normal; overflow-wrap: normal; }
+.pn-sheet tbody th { min-width: 108px; white-space: normal; }
+.pn-sheet-wrap { -webkit-overflow-scrolling: touch; }
