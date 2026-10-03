@@ -2,7 +2,7 @@
 
 [Play the published collection](https://victor07292010-cyber.github.io/VectorSpace/)
 
-Twenty browser games in one portable folder, with online rooms for up to eight friends. No sign-in, ads, remote fonts, or build step. The bundled PeerJS library connects players directly.
+Fifty browser games in one portable folder, with online rooms for up to eight friends. No sign-in, ads, remote fonts, or build step. The bundled PeerJS library connects players directly.
 
 ## Play locally
 
@@ -43,6 +43,14 @@ For local development, run `node tools/serve.cjs` and visit http://127.0.0.1:417
 - Reversi — CPU or online two-player strategy with legal move hints and automatic passes.
 - Rock Paper Scissors — CPU or online friends, with simultaneous hidden choices across five rounds.
 
+### Party Night (online, 2–8 friends)
+
+Twenty party games for online rooms: Punchline, Acro Night, Dictionary Bluff, Truth or Tall Tale (write & vote); Mind Meld, This or That, Who's Most Likely, Rank 'Em (read the room); Ballpark, Buzz Off, Mental Math Dash, Emoji Decoder (quick trivia & reflex); No-Say Clues, Letter Ladder, Alphabet Sprint, Folded Story, Doodle Decoy (words & drawing); Heist Crew, Fib Pile, Off the Map (bluffing & hidden roles). Secrets — answer keys, the real definition, the Decoy's missing word, the Spy's location, the moles, every hand of cards — stay on the host until the reveal.
+
+### Remastered tables
+
+Every solo and vs-computer game has a computer difficulty dial (Easy / Normal / Hard — Normal is the original computer; Hard takes immediate wins, blocks your immediate wins and searches deeper in Checkers and Mancala), a score pad that remembers wins, losses and streaks on this device, and the **N** key for a new game.
+
 Each game includes its rules and any house variants. These are independent implementations with original presentation, not official versions or affiliations. Imposter, Mafia, and Sketch Party require online friends. CPU strategies use only their own player views; they cannot read your hidden identity, dice, or next choice. Solo games reset when leaving; online rooms stay connected while browsing the library. Motion respects reduced-motion preferences, and optional sound is off by default.
 
 ## Publish free on GitHub Pages
@@ -56,8 +64,8 @@ The included workflow rebuilds the offline ZIP and publishes after every push to
 
 ## Verify the games
 
-Install `jsdom@30.1.0` as a development tool, then run `node tools/check-games.cjs`. You can also pass an absolute path to an existing jsdom package as its argument. It checks the original games' start screens, complete computer games, fleet placement, legal dice combinations, local memory play, private party-game state, and timer cancellation. Run `node tools/check-rooms.cjs`, `node tools/check-social.cjs`, and `node tools/check-competitive.cjs` for transport and online engine checks. Run `node tools/check-cpu.cjs` (with the same optional jsdom path) to verify CPU strategies, complete matches, offline controls, and timer cleanup. Run `node tools/check-download.cjs` with the optional jsdom path to extract and test the actual ZIP with all external network access blocked. The published games need no package installation.
+Install `jsdom@30.1.0` as a development tool, then run `node tools/check-games.cjs`. You can also pass an absolute path to an existing jsdom package as its argument. It checks the original games' start screens, complete computer games, fleet placement, legal dice combinations, local memory play, private party-game state, and timer cancellation. Run `node tools/check-party-night.cjs` to fuzz all twenty Party Night games through their own on-screen buttons (full games, rejected junk moves, private views). Run `node tools/check-rooms.cjs`, `node tools/check-social.cjs`, and `node tools/check-competitive.cjs` for transport and online engine checks. Run `node tools/check-cpu.cjs` (with the same optional jsdom path) to verify CPU strategies, complete matches, offline controls, and timer cleanup. Run `node tools/check-download.cjs` with the optional jsdom path to extract and test the actual ZIP with all external network access blocked. The published games need no package installation.
 
 ## Files
 
-`game-night/index.html` is the entry point; `styles.css` contains responsive styles; `shared.js` supplies card and UI helpers; `card-games.js`, `board-games.js`, and `party-games.js` contain offline games; `online-*.js` contain the room protocol, interface, and multiplayer engines; `cpu-games.js` supplies offline computer opponents for five additional games; `polish.js` adds optional sounds and visual details; `app.js` supplies navigation, the game shelf and the spinner; `closet.css` holds the "Game Closet" art direction (felt tables, game boxes, letter-tile room codes, rule booklets). The bundled display and label fonts in `game-night/fonts/` are TeX Gyre Adventor and TeX Gyre Heros Condensed under the GUST Font License. Box-lid artwork for all 30 games is generated by `node tools/build-cover-art.cjs`. All scripts are ordinary browser scripts. PeerJS is vendored under its MIT license in `game-night/vendor/`.
+`game-night/index.html` is the entry point; `styles.css` contains responsive styles; `shared.js` supplies card and UI helpers; `card-games.js`, `board-games.js`, and `party-games.js` contain offline games; `online-*.js` contain the room protocol, interface, and multiplayer engines; `cpu-games.js` supplies offline computer opponents for five additional games; `party-night.js`, `party-night-data.js` and `party-night.css` hold the twenty Party Night room games; `remaster.js` adds the difficulty dial, score pad and keyboard shortcut; `polish.js` adds optional sounds and visual details; `app.js` supplies navigation, the game shelf and the spinner; `closet.css` holds the "Game Closet" art direction (felt tables, game boxes, letter-tile room codes, rule booklets). The bundled display and label fonts in `game-night/fonts/` are TeX Gyre Adventor and TeX Gyre Heros Condensed under the GUST Font License. Box-lid artwork for all 50 games is generated by `node tools/build-cover-art.cjs`. All scripts are ordinary browser scripts. PeerJS is vendored under its MIT license in `game-night/vendor/`.
