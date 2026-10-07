@@ -19,7 +19,7 @@ window.GameNightRoom = (() => {
   function normalizeCode(input){
     let value=String(input||'').trim();
     if(/^https?:\/\//i.test(value)){try{value=new URL(value).hash;}catch{return '';}}
-    if(value.startsWith('#join/'))value=value.slice(6);
+    value=value.replace(/^#(?:join|party)\//,'');
     return value.toUpperCase().replace(/[\s-]/g,'');
   }
   const publicPlayer=p=>({id:p.id,name:p.name,ready:p.ready,connected:p.connected,host:p.host,wins:p.wins||0});
@@ -56,11 +56,15 @@ window.GameNightRoom = (() => {
   }
   function fail(message){stop();status='error';error=message;notify();}
   function errorText(err){
+    if(err.type==='room-full')return 'This party is full. Up to eight people can join.';
+    if(err.type==='service-unconfigured')return 'The party service is not configured yet. Please try again later.';
+    if(err.type==='relay-lost')return 'Your connection to the party server was lost. Create a new party and share its link.';
     if(err.type==='peer-unavailable')return 'That room is not open. Check the code and ask the host to keep their room open.';
     if(err.type==='browser-incompatible')return 'Your browser cannot make this connection. Try a recent version of Chrome, Edge, Firefox, or Safari.';
     if(err.type==='network'||err.type==='server-error'||err.type==='socket-error')return 'Could not reach the room service. Check your internet connection, then try again.';
     return 'The connection could not be completed. Try again, or switch networks if this one blocks game connections.';
   }
+  const Transport=window.VectorSpacePeer||window.Peer;
   function options(){return {debug:0,secure:true,pingInterval:5000,...(window.GAME_NIGHT_PEER_OPTIONS||{})};}
   function validMessage(m){return !!m&&typeof m==='object'&&!Array.isArray(m)&&typeof m.kind==='string'&&JSON.stringify(m).length<16000;}
   function paused(){return room?.phase==='playing'&&room.matchPlayers.some(p=>!room.players.find(m=>m.id===p.id)?.connected);}
@@ -133,13 +137,13 @@ window.GameNightRoom = (() => {
     const gen=generation;
     room={players:[{id:myId,token:playerToken,name:joiningName,ready:true,connected:true,host:true,wins:0,lastSeq:0}],phase:'lobby',gameId:RoomGames.games[preferred]?preferred:'color-clash',matchPlayers:[],state:null,epoch:uid(),reactions:[]};
     notify();
-    if(typeof Peer!=='function'){fail('The connection library did not load. Refresh the page and try again.');return;}
+    if(typeof Transport!=='function'){fail('The connection library did not load. Refresh the page and try again.');return;}
     let attempts=0;
     function open(){
-      peer=new Peer(PREFIX+code,options());
+      peer=new Transport(PREFIX+code,options());
       peer.on('open',()=>{if(gen!==generation)return;clearTimeout(timeout);clearTimeout(retryTimer);retryTimer=null;error='';publish();});
       peer.on('connection',c=>accept(c,gen));
-      peer.on('error',err=>{if(gen!==generation)return;if(err.type==='unavailable-id'&&attempts++<4){peer.destroy();code=roomCode();open();return;}if(!snapshot)fail(errorText(err));else{error='New guests cannot connect right now. Existing players can keep playing.';notify();}});
+      peer.on('error',err=>{if(gen!==generation)return;if(err.type==='unavailable-id'&&attempts++<4){peer.destroy();code=roomCode();open();return;}if(!snapshot||window.VectorSpacePeer)fail(errorText(err));else{error='New guests cannot connect right now. Existing players can keep playing.';notify();}});
       peer.on('disconnected',()=>{if(gen!==generation)return;error='Room service connection interrupted. Reconnecting…';notify();retryTimer=setTimeout(()=>{if(peer?.disconnected&&!peer.destroyed)peer.reconnect();},2000);});
     }
     open();timeout=setTimeout(()=>{if(gen===generation&&status==='connecting')fail('The room service took too long to respond. Please check your connection and try again.');},22000);
@@ -153,9 +157,9 @@ window.GameNightRoom = (() => {
     host=false;room=null;hostConnection=null;code=normalized;joiningName=cleanName(name);playerToken=token||uid();myId='';if(!resuming){snapshot=null;retries=0;}
     status=resuming?'reconnecting':'connecting';error='';moveSequence=0;persist('gn-room-code',code);persist('gn-player-token',playerToken);notify();
     const gen=generation;
-    if(typeof Peer!=='function'){fail('The connection library did not load. Refresh the page and try again.');return;}
+    if(typeof Transport!=='function'){fail('The connection library did not load. Refresh the page and try again.');return;}
     lastHostPacket=Date.now();
-    peer=new Peer(undefined,options());
+    peer=new Transport(undefined,options());
     peer.on('open',()=>{
       if(gen!==generation)return;
       if(hostConnection?.open) return;
@@ -180,7 +184,7 @@ window.GameNightRoom = (() => {
       if(status==='connected'&&Date.now()-lastHostPacket>25000){reconnect();return;}
       if(!snapshot)safeSend(hostConnection,{kind:'sync'});
     },5000);
-    timeout=setTimeout(()=>{if(gen===generation&&status!=='connected')fail('Could not connect to the host. Check the code, keep the host’s tab open, or try another network. Some school, work, and mobile networks block direct connections.');},22000);
+    timeout=setTimeout(()=>{if(gen===generation&&status!=='connected')fail('Could not reach this party. Check your internet connection and ask the host for their current party link.');},22000);
   }
   function reconnect(){
     if(retryTimer)return;

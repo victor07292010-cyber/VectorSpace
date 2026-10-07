@@ -290,7 +290,7 @@
     const id = location.hash.slice(1),
       entry = entries.find((e) => e[0] === id),
       game = G.games[id];
-    if ((id.startsWith('online') || id.startsWith('join/')) && window.GameNightOnline) {
+    if ((id.startsWith('online') || id.startsWith('join/') || id.startsWith('party/')) && window.GameNightOnline) {
       document.body.dataset.view = "room";
       if (localCopy) {
         document.title = 'Play with friends — VectorSpace';

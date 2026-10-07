@@ -5,3 +5,4 @@ artifacts/
 game-night/downloads/*.zip
 .DS_Store
 Thumbs.db
+.wrangler/
