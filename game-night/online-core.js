@@ -2,7 +2,8 @@
 // The host alone holds the full game state. Each guest gets its own redacted view.
 window.RoomGames = (() => {
   const games = Object.create(null);
-  return {games, register(id, engine) {games[id] = engine;}};
+  // Every engine only ever sees plain move objects with a string type; anything else is rejected.
+  return {games, register(id, engine) {const act = engine.act; engine.act = (s, p, a) => !!a && typeof a === 'object' && !Array.isArray(a) && typeof a.type === 'string' && act.call(engine, s, p, a); games[id] = engine;}};
 })();
 window.GameNightRoom = (() => {
   const VERSION=2, PREFIX='gamenight-v2-', MAX_PLAYERS=8;
@@ -36,13 +37,25 @@ window.GameNightRoom = (() => {
       game:room.state&&gameIndex>=0?engine.view(room.state,gameIndex):null,
       done:!!room.state?.done,reactions:room.reactions.slice(-8)};
   }
+  function creditWins(state){if(state.done){for(const winner of new Set(state.winners||[])){const p=room.players.find(p=>p.id===room.matchPlayers[winner]?.id);if(p)p.wins++;}}}
+  // Timed games (countdowns, reaction rounds, fuses) expose engine.tick(state, now).
+  // The host calls it ten times a second and only publishes when the game says something changed.
+  let tickTimer=null;
+  function ensureTicker(){
+    if(tickTimer)return;
+    tickTimer=setInterval(()=>{
+      if(!host||!room||room.phase!=='playing'||!room.state||room.state.done||paused())return;
+      const engine=RoomGames.games[room.gameId];if(typeof engine?.tick!=='function')return;
+      try{const copy=JSON.parse(JSON.stringify(room.state));if(engine.tick(copy,Date.now())){room.state=copy;creditWins(copy);publish();}}catch(e){console.error('Game clock failed',e);}
+    },100);
+  }
   function publish(){
     if(!host||!room)return;
     revision++;snapshot=makeSnapshot(myId);status='connected';notify();
     for(const [id,conn] of connections)safeSend(conn,{kind:'snapshot',data:makeSnapshot(id)});
   }
   function stop(grace=0){
-    generation++;clearTimeout(timeout);clearInterval(heartbeat);clearTimeout(retryTimer);
+    generation++;clearTimeout(timeout);clearInterval(heartbeat);clearTimeout(retryTimer);clearInterval(tickTimer);tickTimer=null;
     timeout=heartbeat=retryTimer=null;
     const oldConnections=[...connections.values(),hostConnection].filter(Boolean),oldPeer=peer;
     connections.clear();hostConnection=null;peer=null;
@@ -88,7 +101,7 @@ window.GameNightRoom = (() => {
         const copy=JSON.parse(JSON.stringify(room.state));
         if(!engine.act(copy,index,m.action)){if(playerId===myId){error='That move is not available right now.';notify();}else safeSend(connections.get(playerId),{kind:'notice',text:'That move is not available right now.'});return;}
         room.state=copy;error='';
-        if(copy.done){for(const winner of new Set(copy.winners||[])){const p=room.players.find(p=>p.id===room.matchPlayers[winner]?.id);if(p)p.wins++;}}
+        creditWins(copy);
         publish();
       }catch(e){console.error('Game action failed',e);if(playerId===myId){error='That move could not be completed. Please try another move.';notify();}else safeSend(connections.get(playerId),{kind:'notice',text:'That move could not be completed. Please try another move.'});}
     }
@@ -194,15 +207,15 @@ window.GameNightRoom = (() => {
     retryTimer=setTimeout(()=>{retryTimer=null;if(gen!==generation)return;join(joiningName,code,true);retries=attempt;},Math.min(1000*2**(attempt-1),8000));
   }
   function send(message){if(host)command(myId,message);else if(!safeSend(hostConnection,message)){error='Still reconnecting. Your move has not been sent.';notify();}}
-  function choose(id){if(!host||room?.phase!=='lobby'||!RoomGames.games[id])return;room.gameId=id;room.players.forEach(p=>p.ready=p.host);error='';publish();}
+  function choose(id){if(!host||room?.phase!=='lobby'||!RoomGames.games[id])return;room.gameId=id;error='';publish();} // Ready stays on: friends don't need to re-ready for every game switch.
   function start(){
     if(!host||!room)return;
     const engine=RoomGames.games[room.gameId],players=room.players.filter(p=>p.connected);
     if(players.length<engine.min||players.length>engine.max){error=`${engine.title} needs ${engine.min===engine.max?engine.min:engine.min+'–'+engine.max} players.`;notify();return;}
     if(room.phase==='lobby'&&players.some(p=>!p.ready)){error='Waiting for everyone to press Ready.';notify();return;}
-    room.matchPlayers=players.map(publicPlayer);room.state=engine.create(room.matchPlayers);room.phase='playing';room.epoch=uid();error='';publish();
+    room.matchPlayers=players.map(publicPlayer);room.state=engine.create(room.matchPlayers);room.phase='playing';room.epoch=uid();error='';publish();ensureTicker();
   }
-  function backToLobby(){if(!host||!room)return;room.phase='lobby';room.state=null;room.matchPlayers=[];room.players=room.players.filter(p=>p.connected);room.players.forEach(p=>p.ready=p.host);room.epoch=uid();error='';publish();}
+  function backToLobby(){if(!host||!room)return;room.phase='lobby';room.state=null;room.matchPlayers=[];room.players=room.players.filter(p=>p.connected);room.epoch=uid();error='';publish();}
   function move(action){if(status!=='connected'||!snapshot||snapshot.paused)return;send({kind:'move',action,seq:++moveSequence,epoch:snapshot.epoch,revision:snapshot.revision});}
   function ready(value){send({kind:'ready',ready:value});}
   function react(emoji){send({kind:'reaction',emoji});}

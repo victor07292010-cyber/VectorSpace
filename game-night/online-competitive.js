@@ -379,7 +379,7 @@
         phase: s.phase,
         round: s.round,
         counts: [...s.counts],
-        dice: [...s.dice[p]],
+        dice: s.dice[p] ? [...s.dice[p]] : [],
         bid: s.bid ? { ...s.bid } : null,
         reveal: s.reveal ? copy(s.reveal) : null,
         done: s.done,

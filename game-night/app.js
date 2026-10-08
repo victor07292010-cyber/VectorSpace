@@ -157,12 +157,12 @@
   const liveUrl = "https://vectorspaceinternationaldevelopment.online/";
   const cpuGames = new Set(['color-clash','crazy-eights','go-fish','sea-battle','connect-four','pig','tic-tac-toe','guess-who','dots-boxes','reversi','liars-dice','rock-paper-scissors', ...(G.cpuIds || [])]);
   const offlineCount = entries.filter(e => G.games[e[0]]).length;
-  const newIds = new Set(G.partyNightIds || (G.expansionCatalog || []).map(e => e[0]));
+  const newIds = new Set(G.arcadeIds || G.partyNightIds || (G.expansionCatalog || []).map(e => e[0]));
   const capacity = id => window.RoomGames?.games[id];
   const reduceMotion = () => window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
 
   /* ── The Game Closet: shared vocabulary for boxes, felt and labels ── */
-  const lidInk = { amber: "#f3c64f", mint: "#9fd3b4", coral: "#ef7357", lavender: "#b3a9ec", sky: "#9fd2e6", navy: "#8795c8" };
+  const lidInk = { amber: "#ffd84d", mint: "#6fdcaa", coral: "#ff8fb8", lavender: "#b79cff", sky: "#7cc8ff", navy: "#9aa6ff" };
   const feltFor = { amber: "green", mint: "teal", coral: "claret", lavender: "plum", sky: "blue", navy: "midnight" };
   const catKey = c => c === "Cards" ? "cards" : c === "Party" ? "party" : "board";
   const boxNo = e => String(entries.indexOf(e) + 1).padStart(2, "0");
