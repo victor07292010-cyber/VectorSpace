@@ -1,3 +1,5 @@
+/* Rounded web fonts (online only; offline copies fall back to rounded system fonts). */
+@import url("https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@600;700;800&display=swap");
 /* ==========================================================================
    VectorSpace — "Toybox" (playful cartoon theme)
    Loaded after closet.css. Chunky outlines, squishy rounded shapes, bright
