@@ -116,7 +116,7 @@ h1, h2, h3, .room-entry-heading h1, .room-heading h1 { font-family: var(--displa
 .table-kicker { color: var(--ink) !important; }
 .table-kicker span { background: var(--pink) !important; color: var(--ink) !important; border: 3px solid var(--ink) !important; border-radius: 999px !important; padding: 4px 12px !important; box-shadow: 0 3px 0 var(--ink); }
 .table-top h1 { color: var(--stock) !important; -webkit-text-stroke: 3px var(--ink); paint-order: stroke fill; text-shadow: 0 7px 0 var(--ink) !important; font-weight: 700; letter-spacing: -.01em; }
-.table-top h1 span { color: var(--lemon) !important; -webkit-text-stroke: 3px var(--ink); paint-order: stroke fill; text-shadow: 0 5px 0 var(--ink) !important; display: inline-block; animation: wiggle 3.2s ease-in-out infinite; transform-origin: 20% 60%; }
+.table-top h1 span { color: var(--lemon) !important; -webkit-text-stroke: 3px var(--ink); paint-order: stroke fill; text-shadow: 0 5px 0 var(--ink) !important; display: block; width: fit-content; animation: wiggle 3.2s ease-in-out infinite; transform-origin: 20% 60%; }
 .table-lede { color: var(--ink-soft) !important; font-size: 1.08rem; font-weight: 700; }
 .table-actions > .game-button { min-height: 62px; font-size: 1.15rem; background: var(--pink); box-shadow: 0 7px 0 var(--ink); }
 .table-actions > .game-button:hover { background: #ffa6c7; }
