@@ -1,9 +1,11 @@
 // Integration test against wrangler dev or the deployed Worker, using real sockets.
 const fs=require('node:fs'),path=require('node:path'),vm=require('node:vm'),assert=require('node:assert/strict');
-const endpoint=process.argv[2]||'ws://127.0.0.1:8787',worlds=[];
+const useMock=process.argv[2]==='mock',endpoint=useMock?'ws://party.mock':(process.argv[2]||'ws://127.0.0.1:8787'),worlds=[];
+// `node tools/check-party-server.cjs mock` runs the real worker code in memory (no network).
+const WS=useMock?require('./party-mock.cjs').createMockServer().MockWebSocket:WebSocket;
 function world(){
   const store=new Map();
-  const c=vm.createContext({console,crypto:require('node:crypto').webcrypto,URL,WebSocket,setTimeout,clearTimeout,setInterval,clearInterval,sessionStorage:{getItem:k=>store.get(k),setItem:(k,v)=>store.set(k,v)}});
+  const c=vm.createContext({console,crypto:require('node:crypto').webcrypto,URL,WebSocket:WS,setTimeout,clearTimeout,setInterval,clearInterval,sessionStorage:{getItem:k=>store.get(k),setItem:(k,v)=>store.set(k,v)}});
   c.window=c;c.addEventListener=()=>{};c.VECTORSPACE_PARTY_SERVER=endpoint;
   for(const file of ['shared.js','party-transport.js','online-core.js','online-cards.js','online-boards.js','online-extras.js','online-competitive.js','online-deduction.js','online-creative.js','strategy-pack.js','party-pack.js','party-night-data.js','party-night.js'])vm.runInContext(fs.readFileSync(path.join(__dirname,'../game-night',file),'utf8'),c,{filename:file});
   const r=c.GameNightRoom;worlds.push(r);return r;
