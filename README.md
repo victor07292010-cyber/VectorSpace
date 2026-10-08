@@ -2,7 +2,7 @@
 
 [Play the published collection](https://victor07292010-cyber.github.io/VectorSpace/)
 
-Fifty browser games in one portable folder, with online rooms for up to eight friends. No sign-in, ads, remote fonts, or build step. Online parties connect through a Cloudflare WebSocket server.
+Sixty browser games in one portable folder, with online rooms for up to eight friends. No sign-in, ads, or build step. The playful "Toybox" look uses the Fredoka and Nunito fonts from Google Fonts when online and rounded system fonts offline. Online parties connect through a Cloudflare WebSocket server.
 
 ## Play locally
 
@@ -43,6 +43,21 @@ For local development, run `node tools/serve.cjs` and visit http://127.0.0.1:417
 - Reversi — CPU or online two-player strategy with legal move hints and automatic passes.
 - Rock Paper Scissors — CPU or online friends, with simultaneous hidden choices across five rounds.
 
+### Arcade Night (online, 2–8 friends) — newest
+
+Ten real-time and table games for online rooms:
+
+- **Quick Draw** — wait for green, tap first. Reaction time is measured on each player's own screen, so lag doesn't count.
+- **Color Rush** — tap the ink colour, not the word.
+- **Hot Potato** — solve the tap to grab the bomb, throw it on, don't be holding it when the secret fuse pops.
+- **Telephone Doodle** — write, draw, guess, draw… then flip through every book and hand out hearts.
+- **Masterpiece Mayhem** — everyone draws the same prompt; the anonymous gallery votes.
+- **Wolf Pack** — one-night werewolf: Werewolves, Seer, Robber, Troublemaker, Insomniac, Villagers, then one vote.
+- **Bluff Court** — claim any role, challenge any claim, block and counter-challenge; last courtier standing wins.
+- **Chip Showdown** — Texas hold'em with rising blinds, side pots and a host cash-out.
+- **Race Home** — four tokens, sixes to leave base, captures and safe stars.
+- **Slides & Ladders** — with one reroll card per player and an exact-100 bounce.
+
 ### Party Night (online, 2–8 friends)
 
 Twenty party games for online rooms: Punchline, Acro Night, Dictionary Bluff, Truth or Tall Tale (write & vote); Mind Meld, This or That, Who's Most Likely, Rank 'Em (read the room); Ballpark, Buzz Off, Mental Math Dash, Emoji Decoder (quick trivia & reflex); No-Say Clues, Letter Ladder, Alphabet Sprint, Folded Story, Doodle Decoy (words & drawing); Heist Crew, Fib Pile, Off the Map (bluffing & hidden roles). Secrets — answer keys, the real definition, the Decoy's missing word, the Spy's location, the moles, every hand of cards — stay on the host until the reveal.
@@ -64,11 +79,11 @@ The included workflow rebuilds the offline ZIP and publishes after every push to
 
 ## Verify the games
 
-Install `jsdom@30.1.0` as a development tool, then run `node tools/check-games.cjs`. You can also pass an absolute path to an existing jsdom package as its argument. It checks the original games' start screens, complete computer games, fleet placement, legal dice combinations, local memory play, private party-game state, and timer cancellation. Run `node tools/check-party-night.cjs` to fuzz all twenty Party Night games through their own on-screen buttons (full games, rejected junk moves, private views). Run `node tools/check-rooms.cjs`, `node tools/check-social.cjs`, and `node tools/check-competitive.cjs` for transport and online engine checks. Run `node tools/check-cpu.cjs` (with the same optional jsdom path) to verify CPU strategies, complete matches, offline controls, and timer cleanup. Run `node tools/check-download.cjs` with the optional jsdom path to extract and test the actual ZIP with all external network access blocked. The published games need no package installation.
+Install `jsdom@30.1.0` as a development tool, then run `node tools/check-games.cjs`. You can also pass an absolute path to an existing jsdom package as its argument. It checks the original games' start screens, complete computer games, fleet placement, legal dice combinations, local memory play, private party-game state, and timer cancellation. Run `node tools/check-all-rooms.cjs` to fuzz every online room game (timed games run on a simulated clock), and `node tools/check-net-games.cjs [ids] [players]` to play real networked matches through the actual party server running in memory (`SPEED=20` speeds up game clocks). Run `node tools/check-party-server.cjs mock` to test the party server without a network. Run `node tools/check-party-night.cjs` to fuzz all twenty Party Night games through their own on-screen buttons (full games, rejected junk moves, private views). Run `node tools/check-rooms.cjs`, `node tools/check-social.cjs`, and `node tools/check-competitive.cjs` for transport and online engine checks. Run `node tools/check-cpu.cjs` (with the same optional jsdom path) to verify CPU strategies, complete matches, offline controls, and timer cleanup. Run `node tools/check-download.cjs` with the optional jsdom path to extract and test the actual ZIP with all external network access blocked. The published games need no package installation.
 
 ## Files
 
-`game-night/index.html` is the entry point; `styles.css` contains responsive styles; `shared.js` supplies card and UI helpers; `card-games.js`, `board-games.js`, and `party-games.js` contain offline games; `online-*.js` contain the room protocol, interface, and multiplayer engines; `cpu-games.js` supplies offline computer opponents for five additional games; `party-night.js`, `party-night-data.js` and `party-night.css` hold the twenty Party Night room games; `remaster.js` adds the difficulty dial, score pad and keyboard shortcut; `polish.js` adds optional sounds and visual details; `app.js` supplies navigation, the game shelf and the spinner; `closet.css` holds the "Game Closet" art direction (felt tables, game boxes, letter-tile room codes, rule booklets). The bundled display and label fonts in `game-night/fonts/` are TeX Gyre Adventor and TeX Gyre Heros Condensed under the GUST Font License. Box-lid artwork for all 50 games is generated by `node tools/build-cover-art.cjs`. All scripts are ordinary browser scripts. The retired PeerJS bundle remains under its MIT license in `game-night/vendor/`, but is no longer loaded.
+`game-night/index.html` is the entry point; `styles.css` contains responsive styles; `shared.js` supplies card and UI helpers; `card-games.js`, `board-games.js`, and `party-games.js` contain offline games; `online-*.js` contain the room protocol, interface, and multiplayer engines; `cpu-games.js` supplies offline computer opponents for five additional games; `party-night.js`, `party-night-data.js` and `party-night.css` hold the twenty Party Night room games; `remaster.js` adds the difficulty dial, score pad and keyboard shortcut; `polish.js` adds optional sounds and visual details; `app.js` supplies navigation, the game shelf and the spinner; `closet.css` holds the page layout; `cartoon.css` is the playful "Toybox" theme on top of it (chunky outlines, pastel colours, bouncy motion); `room-arcade*.js` and `arcade.css` hold the ten Arcade Night games. The bundled display and label fonts in `game-night/fonts/` are TeX Gyre Adventor and TeX Gyre Heros Condensed under the GUST Font License. Box-lid artwork for all 60 games is generated by `node tools/build-cover-art.cjs`. All scripts are ordinary browser scripts. The retired PeerJS bundle remains under its MIT license in `game-night/vendor/`, but is no longer loaded.
 
 ## Party server
 
