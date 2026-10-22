@@ -85,7 +85,7 @@ function extractZip() {
     fs.writeFileSync(target, bytes);
   }
   assert.equal(position, end);
-  for (const required of ["index.html", "offline-help.html", "START-HERE.txt", "cpu-games.js", "strategy-pack.js", "party-pack.js", "strategy-pack.css", "party-pack.css", "room-enhancements.css", "vendor/PEERJS-LICENSE.txt"]) {
+  for (const required of ["index.html", "offline-help.html", "START-HERE.txt", "cpu-games.js", "strategy-pack.js", "conquest.js", "party-pack.js", "strategy-pack.css", "conquest.css", "party-pack.css", "room-enhancements.css", "vendor/PEERJS-LICENSE.txt"]) {
     assert.ok(names.has(`VectorSpace/${required}`), `Download includes ${required}`);
   }
   pass(`ZIP extraction and CRC checks (${count} entries; no source-only or recursive files)`);
@@ -176,8 +176,8 @@ async function main() {
   }
   pass("Extracted index.html loads via file:// without a web server or CDN");
 
-  const offlineIds = ["shut-box", "solitaire", "color-clash", "crazy-eights", "go-fish", "sea-battle", "spectrum", "connect-four", "memory", "pig", "tic-tac-toe", "higher-lower", "guess-who", "dots-boxes", "reversi", "liars-dice", "rock-paper-scissors", "checkers", "mancala", "dominoes", "hex", "nim", "farkle", "yacht-dice", "word-scramble", "trivia-quiz", "unique-bid"];
-  const cpuIds = ["color-clash", "crazy-eights", "go-fish", "sea-battle", "connect-four", "pig", "tic-tac-toe", "guess-who", "dots-boxes", "reversi", "liars-dice", "rock-paper-scissors", "checkers", "mancala", "dominoes", "hex", "nim", "farkle", "yacht-dice", "word-scramble", "trivia-quiz", "unique-bid"];
+  const offlineIds = ["shut-box", "solitaire", "color-clash", "crazy-eights", "go-fish", "sea-battle", "spectrum", "connect-four", "memory", "pig", "tic-tac-toe", "higher-lower", "guess-who", "dots-boxes", "reversi", "liars-dice", "rock-paper-scissors", "checkers", "mancala", "dominoes", "hex", "nim", "conquest", "farkle", "yacht-dice", "word-scramble", "trivia-quiz", "unique-bid"];
+  const cpuIds = ["color-clash", "crazy-eights", "go-fish", "sea-battle", "connect-four", "pig", "tic-tac-toe", "guess-who", "dots-boxes", "reversi", "liars-dice", "rock-paper-scissors", "checkers", "mancala", "dominoes", "hex", "nim", "conquest", "farkle", "yacht-dice", "word-scramble", "trivia-quiz", "unique-bid"];
   const tiles = () => [...document.querySelectorAll(".game-tile")].map((tile) => tile.getAttribute("href").slice(1)).sort();
   assert.equal(document.querySelector('[data-play-style="offline"]').getAttribute("aria-pressed"), "true");
   assert.deepEqual(tiles(), [...offlineIds].sort());

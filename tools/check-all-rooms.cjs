@@ -10,7 +10,7 @@ let fakeNow = Date.now();
 class FakeDate extends Date { constructor(...a) { super(...(a.length ? a : [fakeNow])); } static now() { return fakeNow; } }
 const ctx = vm.createContext({ console, Math, JSON, Date: FakeDate, setTimeout, clearTimeout, setInterval, clearInterval, crypto: require("crypto").webcrypto, localStorage: { getItem: (k) => store.get(k) ?? null, setItem: (k, v) => store.set(k, String(v)), removeItem: (k) => store.delete(k) }, sessionStorage: { getItem: () => null, setItem() {} } });
 ctx.window = ctx; ctx.addEventListener = () => {};
-const files = ["shared.js", "online-core.js", "online-cards.js", "online-boards.js", "online-extras.js", "online-competitive.js", "online-deduction.js", "online-creative.js", "strategy-pack.js", "party-pack.js", "party-night-data.js", "party-night.js"];
+const files = ["shared.js", "online-core.js", "online-cards.js", "online-boards.js", "online-extras.js", "online-competitive.js", "online-deduction.js", "online-creative.js", "strategy-pack.js", "conquest.js", "party-pack.js", "party-night-data.js", "party-night.js"];
 for (const f of fs.readdirSync(dir)) if (/^room-.*\.js$/.test(f)) files.push(f);
 for (const f of files) vm.runInContext(fs.readFileSync(path.join(dir, f), "utf8"), ctx, { filename: f });
 const games = ctx.RoomGames.games, D = ctx.PartyNightData || {};

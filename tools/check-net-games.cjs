@@ -6,7 +6,7 @@
 const fs = require("node:fs"), path = require("node:path"), vm = require("node:vm");
 const { createMockServer } = require("./party-mock.cjs");
 const dir = path.join(__dirname, "../game-night");
-const files = ["shared.js", "party-transport.js", "online-core.js", "online-cards.js", "online-boards.js", "online-extras.js", "online-competitive.js", "online-deduction.js", "online-creative.js", "strategy-pack.js", "party-pack.js", "party-night-data.js", "party-night.js"];
+const files = ["shared.js", "party-transport.js", "online-core.js", "online-cards.js", "online-boards.js", "online-extras.js", "online-competitive.js", "online-deduction.js", "online-creative.js", "strategy-pack.js", "conquest.js", "party-pack.js", "party-night-data.js", "party-night.js"];
 for (const f of fs.readdirSync(dir)) if (/^room-.*\.js$/.test(f)) files.push(f);
 const sources = files.map((f) => [f, fs.readFileSync(path.join(dir, f), "utf8")]);
 const server = createMockServer({ latency: 1 });

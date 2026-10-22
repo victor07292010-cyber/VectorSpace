@@ -7,7 +7,7 @@ function world(){
   const store=new Map();
   const c=vm.createContext({console,crypto:require('node:crypto').webcrypto,URL,WebSocket:WS,setTimeout,clearTimeout,setInterval,clearInterval,sessionStorage:{getItem:k=>store.get(k),setItem:(k,v)=>store.set(k,v)}});
   c.window=c;c.addEventListener=()=>{};c.VECTORSPACE_PARTY_SERVER=endpoint;
-  for(const file of ['shared.js','party-transport.js','online-core.js','online-cards.js','online-boards.js','online-extras.js','online-competitive.js','online-deduction.js','online-creative.js','strategy-pack.js','party-pack.js','party-night-data.js','party-night.js'])vm.runInContext(fs.readFileSync(path.join(__dirname,'../game-night',file),'utf8'),c,{filename:file});
+  for(const file of ['shared.js','party-transport.js','online-core.js','online-cards.js','online-boards.js','online-extras.js','online-competitive.js','online-deduction.js','online-creative.js','strategy-pack.js', 'conquest.js','party-pack.js','party-night-data.js','party-night.js'])vm.runInContext(fs.readFileSync(path.join(__dirname,'../game-night',file),'utf8'),c,{filename:file});
   const r=c.GameNightRoom;worlds.push(r);return r;
 }
 async function until(check,label){const start=Date.now();while(!check()){if(Date.now()-start>12000)throw Error('Timed out: '+label+' '+JSON.stringify(worlds.map(r=>({status:r.data().status,error:r.data().error}))));await new Promise(r=>setTimeout(r,20));}}
